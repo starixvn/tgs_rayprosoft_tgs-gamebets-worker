@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34309.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameWagers.Settlement.Worker", "Tgs.GameWagers.Settlement.Worker\Tgs.GameWagers.Settlement.Worker.csproj", "{1A7277DE-6170-450F-8302-4349F2A456D6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameWagers.Settlement.Worker.Core", "Tgs.GameWagers.Settlement.Worker.Core\Tgs.GameWagers.Settlement.Worker.Core.csproj", "{6A1E27A7-82EA-46D1-8751-B95B99B14AFA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameWagers.Settlement.Worker.Repositories", "Tgs.GameWagers.Settlement.Worker.Repositories\Tgs.GameWagers.Settlement.Worker.Repositories.csproj", "{1EFC2BDD-C2A2-4762-8948-1241C6A3B228}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameWagers.Settlement.Worker.Common", "Tgs.GameWagers.Settlement.Worker.Common\Tgs.GameWagers.Settlement.Worker.Common.csproj", "{B7A7A471-60C8-48BB-9326-9E683D06374E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.GameWagers.Settlement.Worker.Core.UnitTest", "Tgs.GameWagers.Settlement.Worker.Core.UnitTest\Tgs.GameWagers.Settlement.Worker.Core.UnitTest.csproj", "{A3B6E45B-BB04-4EBF-BF72-6C7B070144C4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1A7277DE-6170-450F-8302-4349F2A456D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A7277DE-6170-450F-8302-4349F2A456D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A7277DE-6170-450F-8302-4349F2A456D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A7277DE-6170-450F-8302-4349F2A456D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A1E27A7-82EA-46D1-8751-B95B99B14AFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A1E27A7-82EA-46D1-8751-B95B99B14AFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A1E27A7-82EA-46D1-8751-B95B99B14AFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A1E27A7-82EA-46D1-8751-B95B99B14AFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EFC2BDD-C2A2-4762-8948-1241C6A3B228}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EFC2BDD-C2A2-4762-8948-1241C6A3B228}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EFC2BDD-C2A2-4762-8948-1241C6A3B228}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EFC2BDD-C2A2-4762-8948-1241C6A3B228}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7A7A471-60C8-48BB-9326-9E683D06374E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7A7A471-60C8-48BB-9326-9E683D06374E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7A7A471-60C8-48BB-9326-9E683D06374E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7A7A471-60C8-48BB-9326-9E683D06374E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3B6E45B-BB04-4EBF-BF72-6C7B070144C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3B6E45B-BB04-4EBF-BF72-6C7B070144C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3B6E45B-BB04-4EBF-BF72-6C7B070144C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3B6E45B-BB04-4EBF-BF72-6C7B070144C4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2BCD3E9C-0E65-4EC2-89AC-65D8D72FA175}
+	EndGlobalSection
+EndGlobal
