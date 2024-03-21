@@ -1,0 +1,36 @@
+﻿using System.Text.Json.Nodes;
+using Tgs.GameWagers.Common.Enums;
+
+namespace Tgs.GameBets.Worker.Core.ApplicationServices;
+public record GameBetCommand(
+	Guid GameProviderId,
+	Guid GameProviderConfigurationId,
+	int GameId,
+	Guid ResellerId,
+	Guid LicenseeId,
+	Guid BrandId,
+	string PlayerCode,
+	string CurrencyCode,
+	Guid WalletId,
+	string ExternalRoundId,
+	string ExternalWagerId,
+	DateTimeOffset ExternalCreatedOn,
+	DateTimeOffset ExternalClosedOn,
+	DateTimeOffset ExternalPayoffOn,
+	DateTimeOffset ExternalResettleOn,
+	BetState BetState,
+	BetType BetType,
+	FreeGameState FreeGameState,
+	GambleState GambleState,
+	CashoutState CashoutState,
+	ResettleState ResettleState,
+	JackpotState JackpotState,
+	decimal CurrencyRatio,
+	decimal Bet,
+	decimal ValidBet,
+	decimal Settle,
+	decimal Commission,
+	decimal Turnover,
+	decimal WinLoss,
+	decimal Jackpot,
+	JsonNode AdditionalData);

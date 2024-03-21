@@ -1,6 +1,0 @@
-@Tgs.GameWagers.Settlement.Worker_HostAddress = http://localhost:5191
-
-GET {{Tgs.GameWagers.Settlement.Worker_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

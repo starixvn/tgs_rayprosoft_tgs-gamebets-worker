@@ -1,0 +1,18 @@
+﻿namespace Tgs.GameBets.Worker.Core.Models;
+public record GameWagerStatCloseAdd(
+	Guid GameProviderId,
+	int GameId,
+	Guid ResellerId,
+	Guid LicenseeId,
+	Guid BrandId,
+	string PlayerCode,
+	Guid WalletId,
+	string ExternalRoundId,
+	string ExternalWagerId,
+	DateTimeOffset StatOn,
+	decimal Bet,
+	decimal ValidBet,
+	decimal Settle,
+	decimal Commission,
+	decimal Turnover,
+	decimal WinLoss);

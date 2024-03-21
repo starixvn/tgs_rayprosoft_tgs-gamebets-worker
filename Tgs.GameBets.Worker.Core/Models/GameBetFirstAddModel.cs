@@ -1,0 +1,46 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json.Nodes;
+using System.Threading.Tasks;
+using Tgs.GameWagers.Common.Enums;
+
+namespace Tgs.GameBets.Worker.Core.Models;
+public record GameBetFirstAddModel(
+	Guid Id,
+	Guid GameBetId,
+	Guid GameProviderId,
+	Guid GameProviderConfigurationId,
+	int GameId,
+	Guid ResellerId,
+	Guid LicenseeId,
+	Guid BrandId,
+	string PlayerCode,
+	string CurrencyCode,
+	Guid WalletId,
+	string ExternalRoundId,
+	string ExternalWagerId,
+	DateTimeOffset ExternalCreatedOn,
+	DateTimeOffset ExternalClosedOn,
+	DateTimeOffset ExternalPayoffOn,
+	DateTimeOffset ExternalResettleOn,
+	BetState BetState,
+	BetType BetType,
+	FreeGameState FreeGameState,
+	GambleState GambleState,
+	CashoutState CashoutState,
+	ResettleState ResettleState,
+	JackpotState JackpotState,
+	decimal CurrencyRatio,
+	decimal Bet,
+	decimal ValidBet,
+	decimal Settle,
+	decimal Commission,
+	decimal Turnover,
+	decimal WinLoss,
+	decimal Jackpot,
+	DateTimeOffset CreatedOn,
+	DateTimeOffset ClosedOn,
+	DateTimeOffset UpdatedOn,
+	JsonNode AdditionalData);

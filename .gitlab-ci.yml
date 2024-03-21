@@ -1,8 +1,8 @@
 variables:
-  ImageName: pgtgs/game-gamewagers-settlement-worker
-  SettingKey: game-gamewagers-settlement-worker
-  HelmTemplateFolderName: game-gamewagers-settlement-worker
-  BuildCacheKey: Tgs.GameWagers.Settlement.Worker.$CI_PIPELINE_ID
+  ImageName: pgtgs/game-gamebets-worker
+  SettingKey: game-gamebets-worker
+  HelmTemplateFolderName: game-gamebets-worker
+  BuildCacheKey: Tgs.GameBets.Worker.$CI_PIPELINE_ID
 
 default:
   before_script:
@@ -59,9 +59,9 @@ push-docker-image:
     untracked: true   
     policy: pull
   script:
-    #- dotnet build "Tgs.GameWagers.Settlement.Worker/Tgs.GameWagers.Settlement.Worker.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:$Tag" --no-restore
-    #- docker build -t "$ImageName:$Tag" --build-arg [BUILD_CONFIGURATION]=$BuildConfiguration -f "Tgs.GameWagers.Settlement.Worker/Dockerfile" . --no-cache
-    - dotnet publish "Tgs.GameWagers.Settlement.Worker" 
+    #- dotnet build "Tgs.GameBets.Worker/Tgs.GameBets.Worker.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:$Tag" --no-restore
+    #- docker build -t "$ImageName:$Tag" --build-arg [BUILD_CONFIGURATION]=$BuildConfiguration -f "Tgs.GameBets.Worker/Dockerfile" . --no-cache
+    - dotnet publish "Tgs.GameBets.Worker" 
        --os linux --arch x64
        /t:PublishContainer
        -c $BuildConfiguration
