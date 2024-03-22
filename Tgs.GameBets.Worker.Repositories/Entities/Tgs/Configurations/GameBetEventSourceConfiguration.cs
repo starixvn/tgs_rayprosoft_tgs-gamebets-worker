@@ -17,7 +17,15 @@ namespace Tgs.GameBets.Worker.Entities.Configurations
 
             entity.ToTable("game_bet_event_sources", "dbo");
 
-            entity.HasIndex(e => new { e.CreatedOn, e.GameProviderId, e.GameId, e.WalletId, e.ExternalWagerId }, "ix_game_bet_event_sources");
+            entity.HasIndex(e => new { e.CreatedOn, e.GameProviderId, e.GameId, e.WalletId, e.ExternalBetId }, "ix_game_bet_event_sources");
+
+            entity.HasIndex(e => new { e.CreatedOn, e.BrandId }, "ix_game_bet_event_sources_brand_id");
+
+            entity.HasIndex(e => new { e.CreatedOn, e.BrandId, e.BetState }, "ix_game_bet_event_sources_brand_id_bet_state");
+
+            entity.HasIndex(e => new { e.CreatedOn, e.BrandId, e.BetState, e.Id }, "ix_game_bet_event_sources_brand_id_bet_state_id");
+
+            entity.HasIndex(e => new { e.CreatedOn, e.BrandId, e.Id }, "ix_game_bet_event_sources_brand_id_id");
 
             entity.HasIndex(e => new { e.CreatedOn, e.GameProviderId }, "ix_game_bet_event_sources_g_p");
 
@@ -70,6 +78,10 @@ namespace Tgs.GameBets.Worker.Entities.Configurations
             .HasPrecision(18, 6)
             .HasComment("貨幣比例")
             .HasColumnName("currency_ratio");
+            entity.Property(e => e.ExternalBetId)
+            .HasMaxLength(255)
+            .HasComment("三方投注單別碼")
+            .HasColumnName("external_bet_id");
             entity.Property(e => e.ExternalClosedOn)
             .HasDefaultValueSql("'1970-01-01 00:00:00+00'::timestamp with time zone")
             .HasComment("三方結算/結束時間")
@@ -90,10 +102,6 @@ namespace Tgs.GameBets.Worker.Entities.Configurations
             .HasMaxLength(255)
             .HasComment("三方局/回合識別碼")
             .HasColumnName("external_round_id");
-            entity.Property(e => e.ExternalWagerId)
-            .HasMaxLength(255)
-            .HasComment("三方投注識別碼")
-            .HasColumnName("external_wager_id");
             entity.Property(e => e.FreeGameState)
             .HasDefaultValue(0)
             .HasComment("免費遊戲狀態")

@@ -13,7 +13,7 @@ namespace Tgs.GameBets.Worker.Entities.Configurations
     {
         public void Configure(EntityTypeBuilder<GameBetting> entity)
         {
-            entity.HasKey(e => new { e.GameProviderId, e.GameId, e.WalletId, e.ExternalWagerId }).HasName("pk_game_betting");
+            entity.HasKey(e => new { e.GameProviderId, e.GameId, e.WalletId, e.ExternalBetId }).HasName("pk_game_betting");
 
             entity.ToTable("game_betting", "dbo");
 
@@ -26,10 +26,10 @@ namespace Tgs.GameBets.Worker.Entities.Configurations
             entity.Property(e => e.WalletId)
             .HasComment("錢包識別碼")
             .HasColumnName("wallet_id");
-            entity.Property(e => e.ExternalWagerId)
+            entity.Property(e => e.ExternalBetId)
             .HasMaxLength(255)
-            .HasComment("三方投注識別碼")
-            .HasColumnName("external_wager_id");
+            .HasComment("三方投注單別碼")
+            .HasColumnName("external_bet_id");
             entity.Property(e => e.AdditionalData)
             .HasDefaultValueSql("'{}'::jsonb")
             .HasComment("附加數據")

@@ -3,6 +3,7 @@ using Tgs.GameWagers.Common.Enums;
 
 namespace Tgs.GameBets.Worker.Core.ApplicationServices;
 public record GameBetCommand(
+	Guid Id,
 	Guid GameProviderId,
 	Guid GameProviderConfigurationId,
 	int GameId,
@@ -13,7 +14,7 @@ public record GameBetCommand(
 	string CurrencyCode,
 	Guid WalletId,
 	string ExternalRoundId,
-	string ExternalWagerId,
+	string ExternalBetId,
 	DateTimeOffset ExternalCreatedOn,
 	DateTimeOffset ExternalClosedOn,
 	DateTimeOffset ExternalPayoffOn,

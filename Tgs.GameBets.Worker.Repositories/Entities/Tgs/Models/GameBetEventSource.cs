@@ -68,9 +68,9 @@ public partial class GameBetEventSource
     public string ExternalRoundId { get; set; } = null!;
 
     /// <summary>
-    /// 三方投注識別碼
+    /// 三方投注單別碼
     /// </summary>
-    public string ExternalWagerId { get; set; } = null!;
+    public string ExternalBetId { get; set; } = null!;
 
     /// <summary>
     /// 三方下注/創建時間

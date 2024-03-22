@@ -4,6 +4,6 @@ public record GameBetFirstCommand(
 	int GameId,
 	string PlayerCode,
 	Guid WalletId,
-	string ExternalWagerId,
+	string ExternalBetId,
 	DateTimeOffset ExternalCreatedOn,
 	GameWagers.Common.Enums.BetState BetState);

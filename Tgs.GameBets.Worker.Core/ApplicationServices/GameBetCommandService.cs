@@ -7,8 +7,7 @@ using Tgs.GameWagers.Common;
 namespace Tgs.GameBets.Worker.Core.ApplicationServices;
 internal class GameBetCommandService(
 	ILogger<GameBetCommandService> logger,
-	IGameBetRepository repository,
-	ISerialNumberGenerator serialNumberGenerator) : ICommandService<GameBetCommand>
+	IGameBetRepository repository) : ICommandService<GameBetCommand>
 {
 	public async ValueTask ExecuteAsync(GameBetCommand command, CancellationToken cancellationToken = default)
 	{
@@ -16,24 +15,21 @@ internal class GameBetCommandService(
 		{
 			return;
 		}
+
 		var model = await repository.GetAsync(
 			gameProviderId: command.GameProviderId,
 			gameId: command.GameId,
 			walletId: command.WalletId,
-			externalWagerId: command.ExternalWagerId,
+			externalBetId: command.ExternalBetId,
 			externalCreatedOn: command.ExternalCreatedOn,
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 
 		if (model is null)
 		{
-			var id = await serialNumberGenerator.GenerateAsync(
-				cancellationToken: cancellationToken)
-				.ConfigureAwait(false);
-
 			await repository.AddAsync(
 				source: new GameBetAddModel(
-					Id: id,
+					Id: command.Id,
 					GameProviderId: command.GameProviderId,
 					GameProviderConfigurationId: command.GameProviderConfigurationId,
 					GameId: command.GameId,
@@ -44,7 +40,7 @@ internal class GameBetCommandService(
 					CurrencyCode: command.CurrencyCode,
 					WalletId: command.WalletId,
 					ExternalRoundId: command.ExternalRoundId,
-					ExternalWagerId: command.ExternalWagerId,
+					ExternalBetId: command.ExternalBetId,
 					ExternalCreatedOn: command.ExternalCreatedOn,
 					ExternalClosedOn: command.ExternalClosedOn,
 					ExternalPayoffOn: command.ExternalPayoffOn,
@@ -98,7 +94,7 @@ internal class GameBetCommandService(
 					command.GameId,
 					command.PlayerCode,
 					command.WalletId,
-					command.ExternalWagerId,
+					command.ExternalBetId,
 				});
 
 			await repository.UpdateAsync(

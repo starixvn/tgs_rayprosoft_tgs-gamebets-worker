@@ -20,7 +20,7 @@ internal class GameBetFirstCommandService(
 			gameProviderId: command.GameProviderId,
 			gameId: command.GameId,
 			walletId: command.WalletId,
-			externalWagerId: command.ExternalWagerId,
+			externalBetId: command.ExternalBetId,
 			externalCreatedOn: command.ExternalCreatedOn,
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false))
@@ -32,7 +32,7 @@ internal class GameBetFirstCommandService(
 			gameProviderId: command.GameProviderId,
 			gameId: command.GameId,
 			walletId: command.WalletId,
-			externalWagerId: command.ExternalWagerId,
+			externalBetId: command.ExternalBetId,
 			externalCreatedOn: command.ExternalCreatedOn,
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false)
@@ -56,7 +56,7 @@ internal class GameBetFirstCommandService(
 				CurrencyCode: model.CurrencyCode,
 				WalletId: model.WalletId,
 				ExternalRoundId: model.ExternalRoundId,
-				ExternalWagerId: model.ExternalWagerId,
+				ExternalBetId: model.ExternalBetId,
 				ExternalCreatedOn: model.ExternalCreatedOn,
 				ExternalClosedOn: model.ExternalClosedOn,
 				ExternalPayoffOn: model.ExternalPayoffOn,
@@ -93,7 +93,7 @@ internal class GameBetFirstCommandService(
 				model.PlayerCode,
 				model.WalletId,
 				model.ExternalRoundId,
-				model.ExternalWagerId,
+				model.ExternalBetId,
 				model.Bet,
 				model.ValidBet,
 				model.Settle,

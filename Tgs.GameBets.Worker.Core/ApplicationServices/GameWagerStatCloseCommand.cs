@@ -8,7 +8,7 @@ public record GameWagerStatCloseCommand(
 	string PlayerCode,
 	Guid WalletId,
 	string ExternalRoundId,
-	string ExternalWagerId,
+	string ExternalBetId,
 	decimal Bet,
 	decimal ValidBet,
 	decimal Settle,

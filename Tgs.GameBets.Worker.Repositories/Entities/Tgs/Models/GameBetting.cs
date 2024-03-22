@@ -23,9 +23,9 @@ public partial class GameBetting
     public Guid WalletId { get; set; }
 
     /// <summary>
-    /// 三方投注識別碼
+    /// 三方投注單別碼
     /// </summary>
-    public string ExternalWagerId { get; set; } = null!;
+    public string ExternalBetId { get; set; } = null!;
 
     /// <summary>
     /// 識別碼

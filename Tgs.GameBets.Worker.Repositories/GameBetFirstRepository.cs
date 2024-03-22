@@ -24,7 +24,7 @@ internal class GameBetFirstRepository(
 			CurrencyCode = source.CurrencyCode,
 			WalletId = source.WalletId,
 			ExternalRoundId = source.ExternalRoundId,
-			ExternalWagerId = source.ExternalWagerId,
+			ExternalBetId = source.ExternalBetId,
 			ExternalCreatedOn = source.ExternalCreatedOn.UtcDateTime,
 			ExternalClosedOn = source.ExternalClosedOn.UtcDateTime,
 			ExternalPayoffOn = source.ExternalPayoffOn.UtcDateTime,
@@ -60,13 +60,13 @@ internal class GameBetFirstRepository(
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 	}
-	public async ValueTask<bool> ExistAsync(Guid gameProviderId, int gameId, Guid walletId, string externalWagerId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
+	public async ValueTask<bool> ExistAsync(Guid gameProviderId, int gameId, Guid walletId, string externalBetId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
 		=> await context.GameBetFirsts
 		.AnyAsync(gbs => gbs.ExternalCreatedOn >= externalCreatedOn.UtcDateTime.AddDays(-7) &&
 			gbs.GameProviderId == gameProviderId &&
 			gbs.GameId == gameId &&
 			gbs.WalletId == walletId &&
-			gbs.ExternalWagerId == externalWagerId,
+			gbs.ExternalBetId == externalBetId,
 			cancellationToken: cancellationToken)
 		.ConfigureAwait(false);
 }

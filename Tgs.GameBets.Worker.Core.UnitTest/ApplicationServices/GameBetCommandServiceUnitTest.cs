@@ -15,15 +15,15 @@ public class GameBetCommandServiceUnitTest
 	{
 		var fakeLog = NullLogger<GameBetCommandService>.Instance;
 		var fakeRepository = Substitute.For<IGameBetRepository>();
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var externalRoundId = Guid.NewGuid().ToString();
-		var externalWagerId = Guid.NewGuid().ToString();
+		var externalBetId = Guid.NewGuid().ToString();
 		var externalCreatedOn = DateTimeOffset.UtcNow.AddMinutes(-5);
 		var externalClosedOn = DateTimeOffset.UtcNow.AddSeconds(-5);
 		var externalPayoffOn = DateTimeOffset.UtcNow;
 
 		var command = new GameBetCommand(
+			Id: Guid.NewGuid(),
 			GameProviderId: Guid.NewGuid(),
 			GameProviderConfigurationId: Guid.NewGuid(),
 			GameId: 1,
@@ -34,7 +34,7 @@ public class GameBetCommandServiceUnitTest
 			CurrencyCode: "CNY",
 			WalletId: Guid.NewGuid(),
 			ExternalRoundId: externalRoundId,
-			ExternalWagerId: externalWagerId,
+			ExternalBetId: externalBetId,
 			ExternalCreatedOn: externalCreatedOn,
 			ExternalClosedOn: externalClosedOn,
 			ExternalPayoffOn: externalPayoffOn,
@@ -57,27 +57,21 @@ public class GameBetCommandServiceUnitTest
 			AdditionalData: new JsonObject
 			{
 				["ExternalRoundId"] = externalRoundId,
-				["ExternalWagerId"] = externalWagerId
+				["ExternalBetId"] = externalBetId
 			});
 
 		_ = fakeRepository.GetAsync(
 			gameProviderId: Arg.Is(command.GameProviderId),
 			gameId: Arg.Is(command.GameId),
 			walletId: Arg.Is(command.WalletId),
-			externalWagerId: Arg.Is(command.ExternalWagerId),
+			externalBetId: Arg.Is(command.ExternalBetId),
 			externalCreatedOn: Arg.Is(command.ExternalCreatedOn),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns((GameBetInfoModel?)null);
 
-		var id = Guid.NewGuid();
-		_ = fakeSerialNumberGenerator.GenerateAsync(
-			cancellationToken: Arg.Any<CancellationToken>())
-			.Returns(id);
-
 		var sut = new GameBetCommandService(
 			fakeLog,
-			fakeRepository,
-			fakeSerialNumberGenerator);
+			fakeRepository);
 
 		await sut.ExecuteAsync(command);
 
@@ -85,7 +79,7 @@ public class GameBetCommandServiceUnitTest
 			.Received(1)
 			.AddAsync(
 			source: Arg.Is(new GameBetAddModel(
-					Id: id,
+					Id: command.Id,
 					GameProviderId: command.GameProviderId,
 					GameProviderConfigurationId: command.GameProviderConfigurationId,
 					GameId: command.GameId,
@@ -96,7 +90,7 @@ public class GameBetCommandServiceUnitTest
 					CurrencyCode: command.CurrencyCode,
 					WalletId: command.WalletId,
 					ExternalRoundId: command.ExternalRoundId,
-					ExternalWagerId: command.ExternalWagerId,
+					ExternalBetId: command.ExternalBetId,
 					ExternalCreatedOn: command.ExternalCreatedOn,
 					ExternalClosedOn: command.ExternalClosedOn,
 					ExternalPayoffOn: command.ExternalPayoffOn,
@@ -131,15 +125,15 @@ public class GameBetCommandServiceUnitTest
 	{
 		var fakeLog = NullLogger<GameBetCommandService>.Instance;
 		var fakeRepository = Substitute.For<IGameBetRepository>();
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var externalRoundId = Guid.NewGuid().ToString();
-		var externalWagerId = Guid.NewGuid().ToString();
+		var externalBetId = Guid.NewGuid().ToString();
 		var externalCreatedOn = DateTimeOffset.UtcNow.AddMinutes(-5);
 		var externalClosedOn = DateTimeOffset.UtcNow.AddSeconds(-5);
 		var externalPayoffOn = DateTimeOffset.UtcNow;
 
 		var command = new GameBetCommand(
+			Id: Guid.NewGuid(),
 			GameProviderId: Guid.NewGuid(),
 			GameProviderConfigurationId: Guid.NewGuid(),
 			GameId: 1,
@@ -150,7 +144,7 @@ public class GameBetCommandServiceUnitTest
 			CurrencyCode: "CNY",
 			WalletId: Guid.NewGuid(),
 			ExternalRoundId: externalRoundId,
-			ExternalWagerId: externalWagerId,
+			ExternalBetId: externalBetId,
 			ExternalCreatedOn: externalCreatedOn,
 			ExternalClosedOn: externalClosedOn,
 			ExternalPayoffOn: externalPayoffOn,
@@ -173,7 +167,7 @@ public class GameBetCommandServiceUnitTest
 			AdditionalData: new JsonObject
 			{
 				["ExternalRoundId"] = externalRoundId,
-				["ExternalWagerId"] = externalWagerId
+				["ExternalBetId"] = externalBetId
 			});
 
 		var model = new GameBetInfoModel(
@@ -188,7 +182,7 @@ public class GameBetCommandServiceUnitTest
 			CurrencyCode: "CNY",
 			WalletId: Guid.NewGuid(),
 			ExternalRoundId: externalRoundId,
-			ExternalWagerId: externalWagerId,
+			ExternalBetId: externalBetId,
 			ExternalCreatedOn: externalCreatedOn,
 			ExternalClosedOn: externalClosedOn,
 			ExternalPayoffOn: externalPayoffOn,
@@ -214,21 +208,20 @@ public class GameBetCommandServiceUnitTest
 			AdditionalData: new JsonObject
 			{
 				["ExternalRoundId"] = externalRoundId,
-				["ExternalWagerId"] = externalWagerId
+				["ExternalBetId"] = externalBetId
 			});
 		_ = fakeRepository.GetAsync(
 			gameProviderId: Arg.Is(command.GameProviderId),
 			gameId: Arg.Is(command.GameId),
 			walletId: Arg.Is(command.WalletId),
-			externalWagerId: Arg.Is(command.ExternalWagerId),
+			externalBetId: Arg.Is(command.ExternalBetId),
 			externalCreatedOn: Arg.Is(command.ExternalCreatedOn),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(model);
 
 		var sut = new GameBetCommandService(
 			fakeLog,
-			fakeRepository,
-			fakeSerialNumberGenerator);
+			fakeRepository);
 
 		await sut.ExecuteAsync(command);
 
@@ -269,15 +262,15 @@ public class GameBetCommandServiceUnitTest
 	{
 		var fakeLog = NullLogger<GameBetCommandService>.Instance;
 		var fakeRepository = Substitute.For<IGameBetRepository>();
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
 		var externalRoundId = Guid.NewGuid().ToString();
-		var externalWagerId = Guid.NewGuid().ToString();
+		var externalBetId = Guid.NewGuid().ToString();
 		var externalCreatedOn = DateTimeOffset.UtcNow.AddMinutes(-5);
 		var externalClosedOn = DateTimeOffset.UtcNow.AddSeconds(-5);
 		var externalPayoffOn = DateTimeOffset.UtcNow;
 
 		var command = new GameBetCommand(
+			Id: Guid.NewGuid(),
 			GameProviderId: Guid.NewGuid(),
 			GameProviderConfigurationId: Guid.NewGuid(),
 			GameId: 1,
@@ -288,7 +281,7 @@ public class GameBetCommandServiceUnitTest
 			CurrencyCode: "CNY",
 			WalletId: Guid.NewGuid(),
 			ExternalRoundId: externalRoundId,
-			ExternalWagerId: externalWagerId,
+			ExternalBetId: externalBetId,
 			ExternalCreatedOn: externalCreatedOn,
 			ExternalClosedOn: externalClosedOn,
 			ExternalPayoffOn: externalPayoffOn,
@@ -311,7 +304,7 @@ public class GameBetCommandServiceUnitTest
 			AdditionalData: new JsonObject
 			{
 				["ExternalRoundId"] = externalRoundId,
-				["ExternalWagerId"] = externalWagerId
+				["ExternalBetId"] = externalBetId
 			});
 
 		var model = new GameBetInfoModel(
@@ -326,7 +319,7 @@ public class GameBetCommandServiceUnitTest
 			CurrencyCode: "CNY",
 			WalletId: Guid.NewGuid(),
 			ExternalRoundId: externalRoundId,
-			ExternalWagerId: externalWagerId,
+			ExternalBetId: externalBetId,
 			ExternalCreatedOn: externalCreatedOn,
 			ExternalClosedOn: externalClosedOn,
 			ExternalPayoffOn: externalPayoffOn,
@@ -352,21 +345,20 @@ public class GameBetCommandServiceUnitTest
 			AdditionalData: new JsonObject
 			{
 				["ExternalRoundId"] = externalRoundId,
-				["ExternalWagerId"] = externalWagerId
+				["ExternalBetId"] = externalBetId
 			});
 		_ = fakeRepository.GetAsync(
 			gameProviderId: Arg.Is(command.GameProviderId),
 			gameId: Arg.Is(command.GameId),
 			walletId: Arg.Is(command.WalletId),
-			externalWagerId: Arg.Is(command.ExternalWagerId),
+			externalBetId: Arg.Is(command.ExternalBetId),
 			externalCreatedOn: Arg.Is(command.ExternalCreatedOn),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(model);
 
 		var sut = new GameBetCommandService(
 			fakeLog,
-			fakeRepository,
-			fakeSerialNumberGenerator);
+			fakeRepository);
 
 		await sut.ExecuteAsync(command);
 

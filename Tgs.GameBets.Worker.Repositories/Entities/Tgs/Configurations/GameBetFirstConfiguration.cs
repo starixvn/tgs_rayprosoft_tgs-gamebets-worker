@@ -13,21 +13,27 @@ namespace Tgs.GameBets.Worker.Entities.Configurations
     {
         public void Configure(EntityTypeBuilder<GameBetFirst> entity)
         {
-            entity.HasKey(e => new { e.ExternalCreatedOn, e.GameProviderId, e.GameId, e.WalletId, e.ExternalWagerId }).HasName("pk_game_bet_firsts");
+            entity.HasKey(e => new { e.ExternalCreatedOn, e.GameProviderId, e.GameId, e.WalletId, e.ExternalBetId }).HasName("pk_game_bet_firsts");
 
             entity.ToTable("game_bet_firsts", "dbo");
 
-            entity.HasIndex(e => new { e.GameProviderId, e.GameId, e.WalletId, e.ExternalWagerId }, "ix_game_bet_firsts");
+            entity.HasIndex(e => new { e.GameProviderId, e.GameId, e.WalletId, e.ExternalBetId }, "ix_game_bet_firsts");
 
             entity.HasIndex(e => e.ExternalCreatedOn, "ix_game_bet_firsts_e_c_on");
 
             entity.HasIndex(e => new { e.ExternalCreatedOn, e.BrandId }, "ix_game_bet_firsts_e_c_on_brand_id");
 
+            entity.HasIndex(e => new { e.ExternalCreatedOn, e.ClosedOn }, "ix_game_bet_firsts_e_c_on_closed_on");
+
+            entity.HasIndex(e => new { e.ExternalCreatedOn, e.ClosedOn, e.BrandId }, "ix_game_bet_firsts_e_c_on_closed_on_brand_id");
+
+            entity.HasIndex(e => new { e.ExternalCreatedOn, e.ClosedOn, e.PlayerCode }, "ix_game_bet_firsts_e_c_on_closed_on_player_code");
+
             entity.HasIndex(e => new { e.ExternalCreatedOn, e.CurrencyCode }, "ix_game_bet_firsts_e_c_on_currency_code");
 
-            entity.HasIndex(e => new { e.ExternalCreatedOn, e.ExternalRoundId }, "ix_game_bet_firsts_e_c_on_external_round_id");
+            entity.HasIndex(e => new { e.ExternalCreatedOn, e.ExternalBetId }, "ix_game_bet_firsts_e_c_on_external_bet_id");
 
-            entity.HasIndex(e => new { e.ExternalCreatedOn, e.ExternalWagerId }, "ix_game_bet_firsts_e_c_on_external_wager_id");
+            entity.HasIndex(e => new { e.ExternalCreatedOn, e.ExternalRoundId }, "ix_game_bet_firsts_e_c_on_external_round_id");
 
             entity.HasIndex(e => new { e.ExternalCreatedOn, e.GameProviderConfigurationId }, "ix_game_bet_firsts_e_c_on_g_p_c_id");
 
@@ -60,10 +66,10 @@ namespace Tgs.GameBets.Worker.Entities.Configurations
             entity.Property(e => e.WalletId)
             .HasComment("錢包識別碼")
             .HasColumnName("wallet_id");
-            entity.Property(e => e.ExternalWagerId)
+            entity.Property(e => e.ExternalBetId)
             .HasMaxLength(255)
-            .HasComment("三方投注識別碼")
-            .HasColumnName("external_wager_id");
+            .HasComment("三方投注單別碼")
+            .HasColumnName("external_bet_id");
             entity.Property(e => e.AdditionalData)
             .HasDefaultValueSql("'{}'::jsonb")
             .HasComment("附加數據")

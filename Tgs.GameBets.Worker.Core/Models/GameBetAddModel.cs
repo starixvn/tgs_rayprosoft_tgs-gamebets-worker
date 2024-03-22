@@ -14,7 +14,7 @@ public record GameBetAddModel(
 	string CurrencyCode,
 	Guid WalletId,
 	string ExternalRoundId,
-	string ExternalWagerId,
+	string ExternalBetId,
 	DateTimeOffset ExternalCreatedOn,
 	DateTimeOffset ExternalClosedOn,
 	DateTimeOffset ExternalPayoffOn,

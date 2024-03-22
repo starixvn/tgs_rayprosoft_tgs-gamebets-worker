@@ -1,0 +1,21 @@
+﻿namespace Tgs.GameBets.Worker.Core.Models;
+public record RoundAddModel(
+	Guid Id,
+	Guid GameProviderId,
+	string ExternalRoundId,
+	int GameId,
+	string PlayerCode,
+	Guid WalletId,
+	string CurrencyCode,
+	Guid BrandId,
+	Guid GameProviderConfigurationId,
+	RoundStatus Status,
+	RoundClientStatus ClientStatus,
+	DateTimeOffset ExternalCreatedOn,
+	DateTimeOffset? ExternalClosedOn,
+	decimal Bet,
+	decimal ValidBet,
+	decimal Settle,
+	decimal Commission,
+	decimal Turnover,
+	decimal PlayerWinLoss);

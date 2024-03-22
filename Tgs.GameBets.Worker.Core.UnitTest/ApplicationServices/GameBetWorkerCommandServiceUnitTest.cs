@@ -163,7 +163,7 @@ public class GameBetWorkerCommandServiceUnitTest
 			.Returns(gameWagerMarkerInfo);
 
 		var externalRoundId = DateTimeOffset.UtcNow.AddSeconds(-5).ToUnixTimeMilliseconds().ToString();
-		var externalWagerId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+		var externalBetId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
 		var externalCreatedOn = DateTimeOffset.UtcNow.AddMinutes(-5);
 		var externalClosedOn = DateTimeOffset.UtcNow.AddSeconds(-5);
 		var externalPayoffOn = DateTimeOffset.UtcNow;
@@ -180,7 +180,7 @@ public class GameBetWorkerCommandServiceUnitTest
 			CurrencyCode: "CNY",
 			WalletId: Guid.NewGuid(),
 			ExternalRoundId: externalRoundId,
-			ExternalWagerId: externalWagerId,
+			ExternalBetId: externalBetId,
 			ExternalCreatedOn: externalCreatedOn,
 			ExternalClosedOn: externalClosedOn,
 			ExternalPayoffOn: externalPayoffOn,
@@ -203,7 +203,7 @@ public class GameBetWorkerCommandServiceUnitTest
 			AdditionalData: new JsonObject
 			{
 				["RoundId"] = externalRoundId,
-				["WagerId"] = externalWagerId,
+				["WagerId"] = externalBetId,
 				["BetOn"] = externalCreatedOn,
 				["SettleOn"] = externalClosedOn,
 				["PayoffOn"] = externalPayoffOn
@@ -244,7 +244,7 @@ public class GameBetWorkerCommandServiceUnitTest
 				CurrencyCode: gameBetsEventSourceInfo.CurrencyCode,
 				WalletId: gameBetsEventSourceInfo.WalletId,
 				ExternalRoundId: gameBetsEventSourceInfo.ExternalRoundId,
-				ExternalWagerId: gameBetsEventSourceInfo.ExternalWagerId,
+				ExternalBetId: gameBetsEventSourceInfo.ExternalBetId,
 				ExternalCreatedOn: gameBetsEventSourceInfo.ExternalCreatedOn,
 				ExternalClosedOn: gameBetsEventSourceInfo.ExternalClosedOn,
 				ExternalPayoffOn: gameBetsEventSourceInfo.ExternalPayoffOn,

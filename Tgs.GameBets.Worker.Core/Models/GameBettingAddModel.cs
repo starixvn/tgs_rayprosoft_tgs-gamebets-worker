@@ -6,7 +6,7 @@ public record GameBettingAddModel(
 	Guid GameProviderId,
 	int GameId,
 	Guid WalletId,
-	string ExternalWagerId,
+	string ExternalBetId,
 	Guid GameProviderConfigurationId,
 	Guid ResellerId,
 	Guid LicenseeId,

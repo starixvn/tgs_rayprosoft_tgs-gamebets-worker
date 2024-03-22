@@ -13,12 +13,23 @@
    "Schemas": [
       {
          "Name": "dbo"
+      },
+      {
+         "Name": "bet"
       }
    ],
    "SelectedHandlebarsLanguage": 0,
    "SelectedToBeGenerated": 0,
    "T4TemplatePath": null,
    "Tables": [
+      {
+         "Name": "bet.round_details",
+         "ObjectType": 0
+      },
+      {
+         "Name": "bet.rounds",
+         "ObjectType": 0
+      },
       {
          "Name": "dbo.game_bet_event_sources",
          "ObjectType": 0

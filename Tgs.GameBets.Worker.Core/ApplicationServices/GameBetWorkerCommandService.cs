@@ -63,7 +63,7 @@ internal class GameBetWorkerCommandService(
 						CurrencyCode: gameBetsEventSourceInfo.CurrencyCode,
 						WalletId: gameBetsEventSourceInfo.WalletId,
 						ExternalRoundId: gameBetsEventSourceInfo.ExternalRoundId,
-						ExternalWagerId: gameBetsEventSourceInfo.ExternalWagerId,
+						ExternalBetId: gameBetsEventSourceInfo.ExternalBetId,
 						ExternalCreatedOn: gameBetsEventSourceInfo.ExternalCreatedOn,
 						ExternalClosedOn: gameBetsEventSourceInfo.ExternalClosedOn,
 						ExternalPayoffOn: gameBetsEventSourceInfo.ExternalPayoffOn,

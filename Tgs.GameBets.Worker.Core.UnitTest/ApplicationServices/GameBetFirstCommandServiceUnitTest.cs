@@ -17,7 +17,7 @@ public class GameBetFirstCommandServiceUnitTest
 		var fakeService = Substitute.For<ICommandService<GameWagerStatCloseCommand>>();
 
 		var externalRoundId = Guid.NewGuid().ToString();
-		var externalWagerId = Guid.NewGuid().ToString();
+		var externalBetId = Guid.NewGuid().ToString();
 		var externalCreatedOn = DateTimeOffset.UtcNow.AddMinutes(-5);
 		var externalClosedOn = DateTimeOffset.UtcNow.AddSeconds(-5);
 		var externalPayoffOn = DateTimeOffset.UtcNow;
@@ -27,7 +27,7 @@ public class GameBetFirstCommandServiceUnitTest
 			GameId: 1,
 			PlayerCode: "test",
 			WalletId: Guid.NewGuid(),
-			ExternalWagerId: externalWagerId,
+			ExternalBetId: externalBetId,
 			ExternalCreatedOn: externalCreatedOn,
 			BetState: GameWagers.Common.Enums.BetState.Win);
 
@@ -35,7 +35,7 @@ public class GameBetFirstCommandServiceUnitTest
 			gameProviderId: Arg.Is(command.GameProviderId),
 			gameId: command.GameId,
 			walletId: command.WalletId,
-			externalWagerId: command.ExternalWagerId,
+			externalBetId: command.ExternalBetId,
 			externalCreatedOn: command.ExternalCreatedOn,
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(false);
@@ -52,7 +52,7 @@ public class GameBetFirstCommandServiceUnitTest
 			CurrencyCode: "CNY",
 			WalletId: Guid.NewGuid(),
 			ExternalRoundId: externalRoundId,
-			ExternalWagerId: externalWagerId,
+			ExternalBetId: externalBetId,
 			ExternalCreatedOn: externalCreatedOn,
 			ExternalClosedOn: externalClosedOn,
 			ExternalPayoffOn: externalPayoffOn,
@@ -78,14 +78,14 @@ public class GameBetFirstCommandServiceUnitTest
 			AdditionalData: new JsonObject
 			{
 				["ExternalRoundId"] = externalRoundId,
-				["ExternalWagerId"] = externalWagerId
+				["ExternalBetId"] = externalBetId
 			});
 
 		_ = fakeGameBetRepositoryRepository.GetAsync(
 			gameProviderId: Arg.Is(command.GameProviderId),
 			gameId: Arg.Is(command.GameId),
 			walletId: Arg.Is(command.WalletId),
-			externalWagerId: Arg.Is(command.ExternalWagerId),
+			externalBetId: Arg.Is(command.ExternalBetId),
 			externalCreatedOn: Arg.Is(command.ExternalCreatedOn),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(model);
@@ -119,7 +119,7 @@ public class GameBetFirstCommandServiceUnitTest
 				CurrencyCode: model.CurrencyCode,
 				WalletId: model.WalletId,
 				ExternalRoundId: model.ExternalRoundId,
-				ExternalWagerId: model.ExternalWagerId,
+				ExternalBetId: model.ExternalBetId,
 				ExternalCreatedOn: model.ExternalCreatedOn,
 				ExternalClosedOn: model.ExternalClosedOn,
 				ExternalPayoffOn: model.ExternalPayoffOn,
@@ -157,7 +157,7 @@ public class GameBetFirstCommandServiceUnitTest
 				PlayerCode: model.PlayerCode,
 				WalletId: model.WalletId,
 				ExternalRoundId: model.ExternalRoundId,
-				ExternalWagerId: model.ExternalWagerId,
+				ExternalBetId: model.ExternalBetId,
 				Bet: model.Bet,
 				ValidBet: model.ValidBet,
 				Settle: model.Settle,
@@ -176,7 +176,7 @@ public class GameBetFirstCommandServiceUnitTest
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 		var fakeService = Substitute.For<ICommandService<GameWagerStatCloseCommand>>();
 
-		var externalWagerId = Guid.NewGuid().ToString();
+		var externalBetId = Guid.NewGuid().ToString();
 		var externalCreatedOn = DateTimeOffset.UtcNow.AddMinutes(-5);
 
 		var command = new GameBetFirstCommand(
@@ -184,7 +184,7 @@ public class GameBetFirstCommandServiceUnitTest
 			GameId: 1,
 			PlayerCode: "test",
 			WalletId: Guid.NewGuid(),
-			ExternalWagerId: externalWagerId,
+			ExternalBetId: externalBetId,
 			ExternalCreatedOn: externalCreatedOn,
 			BetState: GameWagers.Common.Enums.BetState.Win);
 
@@ -192,7 +192,7 @@ public class GameBetFirstCommandServiceUnitTest
 			gameProviderId: Arg.Is(command.GameProviderId),
 			gameId: command.GameId,
 			walletId: command.WalletId,
-			externalWagerId: command.ExternalWagerId,
+			externalBetId: command.ExternalBetId,
 			externalCreatedOn: command.ExternalCreatedOn,
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(true);

@@ -13,7 +13,7 @@ public record GameBetHandlerCommand(
 	string CurrencyCode,
 	Guid WalletId,
 	string ExternalRoundId, 
-	string ExternalWagerId,
+	string ExternalBetId,
 	DateTimeOffset ExternalCreatedOn, 
 	DateTimeOffset ExternalClosedOn, 
 	DateTimeOffset ExternalPayoffOn, 

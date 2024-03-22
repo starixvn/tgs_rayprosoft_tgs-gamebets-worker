@@ -23,7 +23,7 @@ internal class GameBetRepository(
 			CurrencyCode = source.CurrencyCode,
 			WalletId = source.WalletId,
 			ExternalRoundId = source.ExternalRoundId,
-			ExternalWagerId = source.ExternalWagerId,
+			ExternalBetId = source.ExternalBetId,
 			ExternalCreatedOn = source.ExternalCreatedOn.UtcDateTime,
 			ExternalClosedOn = source.ExternalClosedOn.UtcDateTime,
 			ExternalPayoffOn = source.ExternalPayoffOn.UtcDateTime,
@@ -60,22 +60,22 @@ internal class GameBetRepository(
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 	}
-	public async ValueTask<bool> ExistAsync(Guid gameProviderId, int gameId, Guid walletId, string externalWagerId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
+	public async ValueTask<bool> ExistAsync(Guid gameProviderId, int gameId, Guid walletId, string externalBetId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
 		=> await context.GameBets
 		.AnyAsync(gbs => gbs.ExternalCreatedOn >= externalCreatedOn.UtcDateTime.AddDays(-7) &&
 			gbs.GameProviderId == gameProviderId &&
 			gbs.GameId == gameId &&
 			gbs.WalletId == walletId &&
-			gbs.ExternalWagerId == externalWagerId,
+			gbs.ExternalBetId == externalBetId,
 			cancellationToken: cancellationToken)
 		.ConfigureAwait(false);
-	public async ValueTask<GameBetInfoModel?> GetAsync(Guid gameProviderId, int gameId, Guid walletId, string externalWagerId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
+	public async ValueTask<GameBetInfoModel?> GetAsync(Guid gameProviderId, int gameId, Guid walletId, string externalBetId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
 		=> await context.GameBets
 		.Where(gbs => gbs.ExternalCreatedOn >= externalCreatedOn.UtcDateTime.AddDays(-7) &&
 			gbs.GameProviderId == gameProviderId &&
 			gbs.GameId == gameId &&
 			gbs.WalletId == walletId &&
-			gbs.ExternalWagerId == externalWagerId)
+			gbs.ExternalBetId == externalBetId)
 		.Select(gws => new GameBetInfoModel(
 			gws.Id,
 			gws.GameProviderId,
@@ -88,7 +88,7 @@ internal class GameBetRepository(
 			gws.CurrencyCode,
 			gws.WalletId,
 			gws.ExternalRoundId,
-			gws.ExternalWagerId,
+			gws.ExternalBetId,
 			gws.ExternalCreatedOn,
 			gws.ExternalClosedOn,
 			gws.ExternalPayoffOn,

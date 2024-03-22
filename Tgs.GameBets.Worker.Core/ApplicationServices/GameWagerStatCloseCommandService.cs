@@ -20,7 +20,7 @@ internal class GameWagerStatCloseCommandService(
 				PlayerCode: command.PlayerCode,
 				WalletId: command.WalletId,
 				ExternalRoundId: command.ExternalRoundId,
-				ExternalWagerId: command.ExternalWagerId,
+				ExternalBetId: command.ExternalBetId,
 				StatOn: statOn,
 				Bet: command.Bet,
 				ValidBet: command.ValidBet,

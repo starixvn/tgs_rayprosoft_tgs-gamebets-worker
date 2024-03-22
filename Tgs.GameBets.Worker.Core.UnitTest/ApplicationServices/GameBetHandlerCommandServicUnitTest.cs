@@ -10,11 +10,12 @@ public class GameBetHandlerCommandServicUnitTest
 	[Fact]
 	public async Task Normal_Process()
 	{
+		var fakeRoundService = Substitute.For<IGetService<RoundCommand, Guid>>();
 		var fakeGameBetService = Substitute.For<ICommandService<GameBetCommand>>();
 		var fakeGameBetFirstService = Substitute.For<ICommandService<GameBetFirstCommand>>();
 
 		var externalRoundId = DateTimeOffset.UtcNow.AddSeconds(-5).ToUnixTimeMilliseconds().ToString();
-		var externalWagerId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+		var externalBetId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
 		var externalCreatedOn = DateTimeOffset.UtcNow.AddMinutes(-5);
 		var externalClosedOn = DateTimeOffset.UtcNow.AddSeconds(-5);
 		var externalPayoffOn = DateTimeOffset.UtcNow;
@@ -30,7 +31,7 @@ public class GameBetHandlerCommandServicUnitTest
 			CurrencyCode: "CNY",
 			WalletId: Guid.NewGuid(),
 			ExternalRoundId: externalRoundId,
-			ExternalWagerId: externalWagerId,
+			ExternalBetId: externalBetId,
 			ExternalCreatedOn: externalCreatedOn,
 			ExternalClosedOn: externalClosedOn,
 			ExternalPayoffOn: externalPayoffOn,
@@ -53,13 +54,39 @@ public class GameBetHandlerCommandServicUnitTest
 			AdditionalData: new JsonObject
 			{
 				["RoundId"] = externalRoundId,
-				["WagerId"] = externalWagerId,
+				["BetId"] = externalBetId,
 				["BetOn"] = externalCreatedOn,
 				["SettleOn"] = externalClosedOn,
 				["PayoffOn"] = externalPayoffOn
 			});
 
+		var id = Guid.NewGuid();
+
+		_ = fakeRoundService.GetAsync(
+			query: Arg.Is(new RoundCommand(
+				GameProviderId: command.GameProviderId,
+				GameProviderConfigurationId: command.GameProviderConfigurationId,
+				GameId: command.GameId,
+				BrandId: command.BrandId,
+				PlayerCode: command.PlayerCode,
+				CurrencyCode: command.CurrencyCode,
+				WalletId: command.WalletId,
+				ExternalBetId: command.ExternalBetId,
+				ExternalCreatedOn: command.ExternalCreatedOn,
+				ExternalClosedOn: command.ExternalClosedOn,
+				BetState: command.BetState,
+				Bet: command.Bet,
+				ValidBet: command.ValidBet,
+				Settle: command.Settle,
+				Commission: command.Commission,
+				Turnover: command.Turnover,
+				PlayerWinLoss: command.WinLoss,
+				AdditionalData: command.AdditionalData)),
+			cancellationToken: Arg.Any<CancellationToken>())
+			.Returns(id);
+
 		var sut = new GameBetHandlerCommandServic(
+			fakeRoundService,
 			fakeGameBetService,
 			fakeGameBetFirstService);
 
@@ -69,6 +96,7 @@ public class GameBetHandlerCommandServicUnitTest
 			.Received(1)
 			.ExecuteAsync(
 			command: Arg.Is(new GameBetCommand(
+				Id: id,
 				GameProviderId: command.GameProviderId,
 				GameProviderConfigurationId: command.GameProviderConfigurationId,
 				GameId: command.GameId,
@@ -79,7 +107,7 @@ public class GameBetHandlerCommandServicUnitTest
 				CurrencyCode: command.CurrencyCode,
 				WalletId: command.WalletId,
 				ExternalRoundId: command.ExternalRoundId,
-				ExternalWagerId: command.ExternalWagerId,
+				ExternalBetId: command.ExternalBetId,
 				ExternalCreatedOn: command.ExternalCreatedOn,
 				ExternalClosedOn: command.ExternalClosedOn,
 				ExternalPayoffOn: command.ExternalPayoffOn,
@@ -110,7 +138,7 @@ public class GameBetHandlerCommandServicUnitTest
 				GameId: command.GameId,
 				PlayerCode: command.PlayerCode,
 				WalletId: command.WalletId,
-				ExternalWagerId: command.ExternalWagerId,
+				ExternalBetId: command.ExternalBetId,
 				ExternalCreatedOn: command.ExternalCreatedOn,
 				BetState: command.BetState)),
 			cancellationToken: Arg.Any<CancellationToken>());

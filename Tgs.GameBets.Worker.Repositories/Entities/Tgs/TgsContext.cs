@@ -28,6 +28,10 @@ public partial class TgsContext : DbContext
 
     public virtual DbSet<GameWagerStatClose> GameWagerStatCloses { get; set; }
 
+    public virtual DbSet<Round> Rounds { get; set; }
+
+    public virtual DbSet<RoundDetail> RoundDetails { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
@@ -44,6 +48,8 @@ public partial class TgsContext : DbContext
         modelBuilder.ApplyConfiguration(new Configurations.GameBettingConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.GameProviderConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.GameWagerStatCloseConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.RoundConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.RoundDetailConfiguration());
         OnModelCreatingPartial(modelBuilder);
     }
 
