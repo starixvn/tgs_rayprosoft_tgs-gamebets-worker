@@ -2,9 +2,9 @@
 using Tgs.GameBets.Worker.Core;
 using Tgs.GameBets.Worker.Core.Models;
 using Tgs.GameBets.Worker.Entities;
-using Tgs.GameWagers.Common.Enums;
 
 namespace Tgs.GameBets.Worker.Repositories;
+
 internal class GameBetFirstRepository(
 	TgsContext context) : IGameBetFirstRepository
 {
@@ -60,6 +60,7 @@ internal class GameBetFirstRepository(
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 	}
+
 	public async ValueTask<bool> ExistAsync(Guid gameProviderId, int gameId, Guid walletId, string externalBetId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
 		=> await context.GameBetFirsts
 		.AnyAsync(gbs => gbs.ExternalCreatedOn >= externalCreatedOn.UtcDateTime.AddDays(-7) &&

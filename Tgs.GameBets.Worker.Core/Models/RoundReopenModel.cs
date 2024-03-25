@@ -8,4 +8,3 @@ public record RoundReopenModel(
 	decimal Commission,
 	decimal Turnover,
 	decimal PlayerWinLoss);
-

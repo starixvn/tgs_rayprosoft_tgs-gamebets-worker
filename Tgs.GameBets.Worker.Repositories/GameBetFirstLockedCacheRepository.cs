@@ -3,9 +3,9 @@ using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using Tgs.GameBets.Worker.Core;
 using Tgs.GameBets.Worker.Core.Models;
-using Tgs.GameBets.Worker.Repositories;
 
 namespace Tgs.GameBets.Worker.Repositories;
+
 internal class GameBetFirstLockedCacheRepository(
 	IGameBetFirstRepository repository,
 	IDatabase database,
@@ -43,6 +43,7 @@ internal class GameBetFirstLockedCacheRepository(
 				.ConfigureAwait(false);
 		}
 	}
+
 	public async ValueTask<bool> ExistAsync(Guid gameProviderId, int gameId, Guid walletId, string externalBetId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
 	{
 		if (!await ExistsKeyAsync(
@@ -78,8 +79,11 @@ internal class GameBetFirstLockedCacheRepository(
 		return true;
 	}
 
+	private static string GetKey(Guid gameProviderId, int gameId, Guid walletId, string externalBetId)
+		=> string.Concat(typeof(GameBetFirstLockedCacheRepository).Namespace!.Replace('.', '-').ToLower(), "bet", ":", "first", ":", "locked", gameProviderId, ":", gameId, ":", walletId, ":", externalBetId);
+
 	private async ValueTask<bool> ExistsKeyAsync(Guid gameProviderId, int gameId, Guid walletId, string externalBetId)
-		=> await database.KeyExistsAsync(
+			=> await database.KeyExistsAsync(
 			key: GetKey(gameProviderId, gameId, walletId, externalBetId))
 		.ConfigureAwait(false);
 
@@ -94,7 +98,6 @@ internal class GameBetFirstLockedCacheRepository(
 				["ExternalBetId"] = externalBetId,
 				["ExternalCreatedOn"] = externalCreatedOn,
 				["LockedOn"] = DateTimeOffset.UtcNow
-
 			}.ToJsonString(),
 			when: When.NotExists,
 			expiry: expiry)
@@ -105,7 +108,4 @@ internal class GameBetFirstLockedCacheRepository(
 			key: GetKey(gameProviderId, gameId, walletId, externalBetId),
 			flags: CommandFlags.FireAndForget)
 		.ConfigureAwait(false);
-
-	private static string GetKey(Guid gameProviderId, int gameId, Guid walletId, string externalBetId)
-		=> string.Concat(typeof(GameBetFirstLockedCacheRepository).Namespace!.Replace('.', '-').ToLower(), "bet", ":", "first", ":", "locked", gameProviderId, ":", gameId, ":", walletId, ":", externalBetId);
 }

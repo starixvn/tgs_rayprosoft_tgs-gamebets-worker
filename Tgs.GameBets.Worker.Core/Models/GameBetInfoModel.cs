@@ -1,6 +1,5 @@
-﻿using System.Reflection;
-using System.Text.Json.Nodes;
-using Tgs.GameWagers.Common.Enums;
+﻿using System.Text.Json.Nodes;
+using Tgs.GameBets.Queue.Common.Enums;
 
 namespace Tgs.GameBets.Worker.Core.Models;
 public record GameBetInfoModel(

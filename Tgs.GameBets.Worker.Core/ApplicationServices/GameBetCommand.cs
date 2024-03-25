@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Nodes;
-using Tgs.GameWagers.Common.Enums;
+using Tgs.GameBets.Queue.Common.Enums;
 
 namespace Tgs.GameBets.Worker.Core.ApplicationServices;
 public record GameBetCommand(

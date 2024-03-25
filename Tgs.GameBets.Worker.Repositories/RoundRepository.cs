@@ -4,6 +4,7 @@ using Tgs.GameBets.Worker.Core.Models;
 using Tgs.GameBets.Worker.Entities;
 
 namespace Tgs.GameBets.Worker.Repositories;
+
 internal class RoundRepository(
 	TgsContext context) : IRoundRepository
 {
@@ -44,6 +45,7 @@ internal class RoundRepository(
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 	}
+
 	public async ValueTask ClosedAsync(Guid id, RoundClosedModel source, CancellationToken cancellationToken = default)
 	{
 		var round = await context.Rounds.SingleAsync(
@@ -70,6 +72,7 @@ internal class RoundRepository(
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 	}
+
 	public async ValueTask<RoundInfoModel?> GetAsync(Guid id, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
 		=> await context.Rounds.AsQueryable()
 		.Where(x =>
@@ -94,6 +97,7 @@ internal class RoundRepository(
 			round.ReopenedOn))
 		.FirstOrDefaultAsync(cancellationToken)
 		.ConfigureAwait(false);
+
 	public async ValueTask<RoundInfoModel?> GetAsync(Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
 		=> await context.Rounds.AsQueryable()
 		.Where(x =>
@@ -121,6 +125,7 @@ internal class RoundRepository(
 			round.ReopenedOn))
 		.FirstOrDefaultAsync(cancellationToken)
 		.ConfigureAwait(false);
+
 	public async ValueTask<Guid?> GetIdAsync(Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
 		=> await context.Rounds.AsQueryable()
 		.Where(x =>
@@ -133,6 +138,7 @@ internal class RoundRepository(
 		.Select(x => (Guid?)x.Id)
 		.FirstOrDefaultAsync(cancellationToken)
 		.ConfigureAwait(false);
+
 	public async ValueTask MergeDetailAsync(Guid id, string additionalData, CancellationToken cancellationToken = default)
 	{
 		var roundDetail = await context.RoundDetails
@@ -165,6 +171,7 @@ internal class RoundRepository(
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 	}
+
 	public async ValueTask OpenAsync(Guid id, RoundOpenModel source, CancellationToken cancellationToken = default)
 	{
 		var round = await context.Rounds.SingleAsync(
@@ -184,6 +191,7 @@ internal class RoundRepository(
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 	}
+
 	public async ValueTask ReopenAsync(Guid id, RoundReopenModel source, CancellationToken cancellationToken = default)
 	{
 		var round = await context.Rounds.SingleAsync(

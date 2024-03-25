@@ -16,11 +16,7 @@ public partial class TgsContext : DbContext
 
     public virtual DbSet<GameBet> GameBets { get; set; }
 
-    public virtual DbSet<GameBetEventSource> GameBetEventSources { get; set; }
-
     public virtual DbSet<GameBetFirst> GameBetFirsts { get; set; }
-
-    public virtual DbSet<GameBetMarker> GameBetMarkers { get; set; }
 
     public virtual DbSet<GameBetting> GameBettings { get; set; }
 
@@ -42,9 +38,7 @@ public partial class TgsContext : DbContext
             .HasPostgresExtension("uuid-ossp");
 
         modelBuilder.ApplyConfiguration(new Configurations.GameBetConfiguration());
-        modelBuilder.ApplyConfiguration(new Configurations.GameBetEventSourceConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.GameBetFirstConfiguration());
-        modelBuilder.ApplyConfiguration(new Configurations.GameBetMarkerConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.GameBettingConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.GameProviderConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.GameWagerStatCloseConfiguration());

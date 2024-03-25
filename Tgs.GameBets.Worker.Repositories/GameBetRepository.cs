@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Tgs.GameWagers.Common.Enums;
+using Tgs.GameBets.Queue.Common.Enums;
 using Tgs.GameBets.Worker.Core;
 using Tgs.GameBets.Worker.Core.Models;
 using Tgs.GameBets.Worker.Entities;
 
 namespace Tgs.GameBets.Worker.Repositories;
+
 internal class GameBetRepository(
 	TgsContext context) : IGameBetRepository
 {
@@ -60,6 +61,7 @@ internal class GameBetRepository(
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 	}
+
 	public async ValueTask<bool> ExistAsync(Guid gameProviderId, int gameId, Guid walletId, string externalBetId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
 		=> await context.GameBets
 		.AnyAsync(gbs => gbs.ExternalCreatedOn >= externalCreatedOn.UtcDateTime.AddDays(-7) &&
@@ -69,6 +71,7 @@ internal class GameBetRepository(
 			gbs.ExternalBetId == externalBetId,
 			cancellationToken: cancellationToken)
 		.ConfigureAwait(false);
+
 	public async ValueTask<GameBetInfoModel?> GetAsync(Guid gameProviderId, int gameId, Guid walletId, string externalBetId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
 		=> await context.GameBets
 		.Where(gbs => gbs.ExternalCreatedOn >= externalCreatedOn.UtcDateTime.AddDays(-7) &&
@@ -115,6 +118,7 @@ internal class GameBetRepository(
 		.FirstOrDefaultAsync(
 			cancellationToken: cancellationToken)
 		.ConfigureAwait(false);
+
 	public async ValueTask UpdateAsync(GameBetUpdateModel source, CancellationToken cancellationToken = default)
 	{
 		var entity = await context.GameBets

@@ -5,6 +5,7 @@ using Tgs.GameBets.Worker.Core;
 using Tgs.GameBets.Worker.Core.Models;
 
 namespace Tgs.GameBets.Worker.Repositories;
+
 internal class RoundLockedCacheRepository(
 	IRoundRepository repository,
 	IDatabase database,
@@ -42,23 +43,33 @@ internal class RoundLockedCacheRepository(
 				.ConfigureAwait(false);
 		}
 	}
+
 	public ValueTask ClosedAsync(Guid id, RoundClosedModel source, CancellationToken cancellationToken = default)
 		=> repository.ClosedAsync(id, source, cancellationToken);
+
 	public ValueTask<RoundInfoModel?> GetAsync(Guid id, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
 		=> repository.GetAsync(id, externalCreatedOn, cancellationToken);
+
 	public ValueTask<RoundInfoModel?> GetAsync(Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
 		=> repository.GetAsync(gameProviderId, gameId, walletId, externalRoundId, externalCreatedOn, cancellationToken);
+
 	public ValueTask<Guid?> GetIdAsync(Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
 		=> repository.GetIdAsync(gameProviderId, gameId, walletId, externalRoundId, externalCreatedOn, cancellationToken);
+
 	public ValueTask MergeDetailAsync(Guid id, string additionalData, CancellationToken cancellationToken = default)
 		=> repository.MergeDetailAsync(id, additionalData, cancellationToken);
+
 	public ValueTask OpenAsync(Guid id, RoundOpenModel source, CancellationToken cancellationToken = default)
 		=> repository.OpenAsync(id, source, cancellationToken);
+
 	public ValueTask ReopenAsync(Guid id, RoundReopenModel source, CancellationToken cancellationToken = default)
 		=> repository.ReopenAsync(id, source, cancellationToken);
 
+	private static string GetKey(Guid gameProviderId, int gameId, Guid walletId, string externalRoundId)
+		=> string.Concat(typeof(RoundLockedCacheRepository).Namespace!.Replace('.', '-').ToLower(), "round", ":", "locked", gameProviderId, ":", gameId, ":", walletId, ":", externalRoundId);
+
 	private async ValueTask<bool> SetKeyAsync(Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, DateTimeOffset externalCreatedOn)
-		=> await database.StringSetAsync(
+			=> await database.StringSetAsync(
 			key: GetKey(gameProviderId, gameId, walletId, externalRoundId),
 			value: new JsonObject
 			{
@@ -68,7 +79,6 @@ internal class RoundLockedCacheRepository(
 				["ExternalRoundId"] = externalRoundId,
 				["ExternalCreatedOn"] = externalCreatedOn,
 				["LockedOn"] = DateTimeOffset.UtcNow
-
 			}.ToJsonString(),
 			when: When.NotExists,
 			expiry: expiry)
@@ -79,7 +89,4 @@ internal class RoundLockedCacheRepository(
 			key: GetKey(gameProviderId, gameId, walletId, externalRoundId),
 			flags: CommandFlags.FireAndForget)
 		.ConfigureAwait(false);
-
-	private static string GetKey(Guid gameProviderId, int gameId, Guid walletId, string externalRoundId)
-		=> string.Concat(typeof(RoundLockedCacheRepository).Namespace!.Replace('.', '-').ToLower(), "round", ":", "locked", gameProviderId, ":", gameId, ":", walletId, ":", externalRoundId);
 }

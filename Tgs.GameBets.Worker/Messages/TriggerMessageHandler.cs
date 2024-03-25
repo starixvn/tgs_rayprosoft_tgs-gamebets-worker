@@ -1,7 +1,9 @@
-﻿using Valhalla.MessageQueue;
+﻿using Tgs.GameBets.Worker.Common.Protos;
+
 using Tgs.GameBets.Worker.Core;
 using Tgs.GameBets.Worker.Core.ApplicationServices;
-using Tgs.GameBets.Worker.Common.Protos;
+
+using Valhalla.MessageQueue;
 
 namespace Tgs.GameBets.Worker.Messages;
 

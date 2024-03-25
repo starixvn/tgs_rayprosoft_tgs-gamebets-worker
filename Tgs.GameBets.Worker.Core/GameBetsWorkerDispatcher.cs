@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
-using Tgs.GameBets.Worker.Core;
 using Tgs.GameBets.Worker.Core.ApplicationServices;
 
 namespace Tgs.GameBets.Worker.Core;

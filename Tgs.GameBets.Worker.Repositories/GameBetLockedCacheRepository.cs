@@ -5,6 +5,7 @@ using Tgs.GameBets.Worker.Core;
 using Tgs.GameBets.Worker.Core.Models;
 
 namespace Tgs.GameBets.Worker.Repositories;
+
 internal class GameBetLockedCacheRepository(
 	IGameBetRepository repository,
 	IDatabase database,
@@ -42,7 +43,7 @@ internal class GameBetLockedCacheRepository(
 				.ConfigureAwait(false);
 		}
 	}
-	
+
 	public async ValueTask<bool> ExistAsync(Guid gameProviderId, int gameId, Guid walletId, string externalBetId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
 	{
 		if (!await ExistsKeyAsync(
@@ -77,15 +78,18 @@ internal class GameBetLockedCacheRepository(
 
 		return true;
 	}
-	
+
 	public ValueTask<GameBetInfoModel?> GetAsync(Guid gameProviderId, int gameId, Guid walletId, string externalBetId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
 		=> repository.GetAsync(gameProviderId, gameId, walletId, externalBetId, externalCreatedOn, cancellationToken);
-	
+
 	public ValueTask UpdateAsync(GameBetUpdateModel source, CancellationToken cancellationToken = default)
 		=> repository.UpdateAsync(source, cancellationToken);
 
+	private static string GetKey(Guid gameProviderId, int gameId, Guid walletId, string externalBetId)
+		=> string.Concat(typeof(GameBetLockedCacheRepository).Namespace!.Replace('.', '-').ToLower(), "bet", ":", "locked", gameProviderId, ":", gameId, ":", walletId, ":", externalBetId);
+
 	private async ValueTask<bool> ExistsKeyAsync(Guid gameProviderId, int gameId, Guid walletId, string externalBetId)
-		=> await database.KeyExistsAsync(
+			=> await database.KeyExistsAsync(
 			key: GetKey(gameProviderId, gameId, walletId, externalBetId))
 		.ConfigureAwait(false);
 
@@ -100,7 +104,6 @@ internal class GameBetLockedCacheRepository(
 				["ExternalBetId"] = externalBetId,
 				["ExternalCreatedOn"] = externalCreatedOn,
 				["LockedOn"] = DateTimeOffset.UtcNow
-
 			}.ToJsonString(),
 			when: When.NotExists,
 			expiry: expiry)
@@ -111,7 +114,4 @@ internal class GameBetLockedCacheRepository(
 			key: GetKey(gameProviderId, gameId, walletId, externalBetId),
 			flags: CommandFlags.FireAndForget)
 		.ConfigureAwait(false);
-
-	private static string GetKey(Guid gameProviderId, int gameId, Guid walletId, string externalBetId)
-		=> string.Concat(typeof(GameBetLockedCacheRepository).Namespace!.Replace('.', '-').ToLower(), "bet", ":", "locked", gameProviderId, ":", gameId, ":", walletId, ":", externalBetId);
 }

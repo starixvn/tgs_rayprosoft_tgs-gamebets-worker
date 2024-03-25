@@ -1,11 +1,12 @@
 ﻿using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
+using Tgs.GameBets.Queue.Common.Enums;
 using Tgs.GameBets.Worker.Core.ApplicationServices;
-using Tgs.GameWagers.Common.Enums;
 using Tgs.SerialNumberGenerator;
 
 namespace Tgs.GameBets.Worker.Core.UnitTest.ApplicationServices;
+
 public class RoundCommandGetServiceUnitTest
 {
 	[Fact]

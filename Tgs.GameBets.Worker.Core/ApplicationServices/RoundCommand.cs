@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Nodes;
-using System.Threading.Tasks;
-using Tgs.GameWagers.Common.Enums;
+﻿using System.Text.Json.Nodes;
+using Tgs.GameBets.Queue.Common.Enums;
 
 namespace Tgs.GameBets.Worker.Core.ApplicationServices;
 public record RoundCommand(

@@ -1,7 +1,7 @@
-﻿using Tgs.GameWagers.Common;
-using Tgs.GameBets.Worker.Core.Models;
+﻿using Tgs.GameBets.Worker.Core.Models;
 
 namespace Tgs.GameBets.Worker.Core;
+
 public interface IGameBetRepository
 {
 	ValueTask AddAsync(GameBetAddModel source, CancellationToken cancellationToken = default);

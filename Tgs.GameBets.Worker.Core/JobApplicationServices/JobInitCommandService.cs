@@ -1,11 +1,10 @@
 ﻿using System.Runtime.InteropServices;
 using Hangfire;
-using Microsoft.Extensions.Logging;
-using Tgs.ServiceUtility;
 using Hangfire.Storage;
-using Tgs.GameBets.Worker.Core;
-using Tgs.GameBets.Worker.Core.JobApplicationServices;
+using Microsoft.Extensions.Logging;
 using Tgs.GameBets.Worker.Core.Models;
+
+using Tgs.ServiceUtility;
 
 namespace Tgs.GameBets.Worker.Core.JobApplicationServices;
 

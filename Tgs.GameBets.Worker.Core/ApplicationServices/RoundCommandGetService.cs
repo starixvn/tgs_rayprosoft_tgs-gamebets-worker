@@ -1,9 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using Tgs.GameWagers.Common.Enums;
+using Tgs.GameBets.Queue.Common.Enums;
 using Tgs.SerialNumberGenerator;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameBets.Worker.Core.ApplicationServices;
+
 internal class RoundCommandGetService(
 	ILogger<RoundCommandGetService> logger,
 	ISerialNumberGenerator serialNumberGenerator,
@@ -150,7 +151,6 @@ internal class RoundCommandGetService(
 						info.PlayerWinLoss != playerWinLoss ||
 						info.ClientStatus != clientStatus)
 						{
-
 							await repository.ReopenAsync(
 								id!.Value,
 								source: new Models.RoundReopenModel(

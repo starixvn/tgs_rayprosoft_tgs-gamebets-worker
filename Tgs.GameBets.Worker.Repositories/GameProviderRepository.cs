@@ -4,6 +4,7 @@ using Tgs.GameBets.Worker.Core.Models;
 using Tgs.GameBets.Worker.Entities;
 
 namespace Tgs.GameBets.Worker.Repositories;
+
 internal class GameProviderRepository(
 	TgsContext context) : IGameProviderRepository
 {
@@ -14,6 +15,7 @@ internal class GameProviderRepository(
 		.SingleAsync(
 			cancellationToken: cancellationToken)
 		.ConfigureAwait(false);
+
 	public IAsyncEnumerable<GameProviderInfoModel> QueryAsync(CancellationToken cancellationToken = default)
 		=> context.GameProviders
 		.Where(predicate: gp => gp.Status != 1)

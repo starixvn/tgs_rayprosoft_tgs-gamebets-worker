@@ -4,6 +4,7 @@ using Tgs.GameBets.Worker.Core.Models;
 using Tgs.GameBets.Worker.Entities;
 
 namespace Tgs.GameBets.Worker.Repositories;
+
 internal class GameWagerStatCloseRepository(TgsContext context) : IGameWagerStatCloseRepository
 {
 	public async ValueTask AddAsync(GameWagerStatCloseAdd source, CancellationToken cancellationToken = default)

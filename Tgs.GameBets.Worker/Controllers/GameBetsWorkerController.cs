@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Valhalla.MessageQueue;
 using Tgs.GameBets.Worker.Common;
 using Tgs.GameBets.Worker.Common.Protos;
 
+using Valhalla.MessageQueue;
+
 namespace Tgs.GameBets.Worker.Controllers;
+
 [Route("game-bets-Worker")]
 [ApiController]
 public class GameBetsWorkerController : ControllerBase

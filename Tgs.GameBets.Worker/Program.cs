@@ -77,12 +77,13 @@ builder.Services.AddGameBetsWorker(
 	{
 		var configuration = sp.GetRequiredService<IConfiguration>();
 		options.ConnectionString = configuration.GetConnectionString("Redis")!;
-	},
-	(options, sp) =>
+	})
+	.AddGameBetQueueClient((httpClientBuilder) =>
+	httpClientBuilder.ConfigureHttpClient((sp, http) =>
 	{
 		var configuration = sp.GetRequiredService<IConfiguration>();
-		options.BaseUrl = configuration.GetValue<Uri>("GameBetsWorkerConnectionStrings:GameWagersClientBaseUrl")!;
-	});
+		http.BaseAddress = configuration.GetValue<Uri>("GameBetsWorkerConnectionStrings:GameBetQueueClientBaseUrl")!;
+	}));
 
 builder.Services
 	.AddKeyedSingleton("Nats", (sp, _) => new NatsConnection(NatsOpts.Default with

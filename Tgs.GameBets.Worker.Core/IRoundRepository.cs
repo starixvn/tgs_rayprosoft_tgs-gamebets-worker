@@ -1,6 +1,7 @@
 ﻿using Tgs.GameBets.Worker.Core.Models;
 
 namespace Tgs.GameBets.Worker.Core;
+
 public interface IRoundRepository
 {
 	ValueTask AddAsync(RoundAddModel source, CancellationToken cancellationToken = default);

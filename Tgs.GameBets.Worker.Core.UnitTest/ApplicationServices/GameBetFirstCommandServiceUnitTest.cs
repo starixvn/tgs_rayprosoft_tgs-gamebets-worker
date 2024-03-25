@@ -6,6 +6,7 @@ using Tgs.SerialNumberGenerator;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameBets.Worker.Core.UnitTest.ApplicationServices;
+
 public class GameBetFirstCommandServiceUnitTest
 {
 	[Fact]
@@ -29,7 +30,7 @@ public class GameBetFirstCommandServiceUnitTest
 			WalletId: Guid.NewGuid(),
 			ExternalBetId: externalBetId,
 			ExternalCreatedOn: externalCreatedOn,
-			BetState: GameWagers.Common.Enums.BetState.Win);
+			BetState: Queue.Common.Enums.BetState.Win);
 
 		_ = fakeGameBetFirstRepositoryRepository.ExistAsync(
 			gameProviderId: Arg.Is(command.GameProviderId),
@@ -57,13 +58,13 @@ public class GameBetFirstCommandServiceUnitTest
 			ExternalClosedOn: externalClosedOn,
 			ExternalPayoffOn: externalPayoffOn,
 			ExternalResettleOn: DateTimeOffset.UnixEpoch,
-			BetState: GameWagers.Common.Enums.BetState.Win,
-			BetType: GameWagers.Common.Enums.BetType.Normal,
-			FreeGameState: GameWagers.Common.Enums.FreeGameState.None,
-			GambleState: GameWagers.Common.Enums.GambleState.None,
-			CashoutState: GameWagers.Common.Enums.CashoutState.None,
-			ResettleState: GameWagers.Common.Enums.ResettleState.None,
-			JackpotState: GameWagers.Common.Enums.JackpotState.None,
+			BetState: Queue.Common.Enums.BetState.Win,
+			BetType: Queue.Common.Enums.BetType.Normal,
+			FreeGameState: Queue.Common.Enums.FreeGameState.None,
+			GambleState: Queue.Common.Enums.GambleState.None,
+			CashoutState: Queue.Common.Enums.CashoutState.None,
+			ResettleState: Queue.Common.Enums.ResettleState.None,
+			JackpotState: Queue.Common.Enums.JackpotState.None,
 			CurrencyRatio: 1,
 			Bet: 100,
 			ValidBet: 50,
@@ -186,7 +187,7 @@ public class GameBetFirstCommandServiceUnitTest
 			WalletId: Guid.NewGuid(),
 			ExternalBetId: externalBetId,
 			ExternalCreatedOn: externalCreatedOn,
-			BetState: GameWagers.Common.Enums.BetState.Win);
+			BetState: Queue.Common.Enums.BetState.Win);
 
 		_ = fakeGameBetFirstRepositoryRepository.ExistAsync(
 			gameProviderId: Arg.Is(command.GameProviderId),

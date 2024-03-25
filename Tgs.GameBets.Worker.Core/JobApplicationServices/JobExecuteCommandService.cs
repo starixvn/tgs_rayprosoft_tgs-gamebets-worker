@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
-using Tgs.ServiceUtility;
-using Valhalla.MessageQueue;
 using Tgs.GameBets.Worker.Common;
 using Tgs.GameBets.Worker.Common.Protos;
+
+using Tgs.ServiceUtility;
+using Valhalla.MessageQueue;
 
 namespace Tgs.GameBets.Worker.Core.JobApplicationServices;
 
@@ -12,7 +13,6 @@ internal class JobExecuteCommandService(
 {
 	public ValueTask ExecuteAsync(JobExecuteCommand command, CancellationToken cancellationToken = default)
 	{
-
 		var message = new GameBetsWorkerMessage
 		{
 			GameProviderCode = command.GameProviderCode,

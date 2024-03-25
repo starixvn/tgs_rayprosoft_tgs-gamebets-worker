@@ -1,6 +1,7 @@
 ﻿using Tgs.ServiceUtility;
 
 namespace Tgs.GameBets.Worker.Core.ApplicationServices;
+
 internal class GameBetHandlerCommandServic(
 	IGetService<RoundCommand, Guid> roundService,
 	ICommandService<GameBetCommand> gameBetService,

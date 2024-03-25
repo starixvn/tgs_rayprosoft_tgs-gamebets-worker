@@ -2,9 +2,9 @@
 using System.Threading.Channels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Tgs.ServiceUtility;
-using Tgs.GameBets.Worker.Core;
 using Tgs.GameBets.Worker.Core.ApplicationServices;
+
+using Tgs.ServiceUtility;
 
 namespace Tgs.GameBets.Worker.Core;
 

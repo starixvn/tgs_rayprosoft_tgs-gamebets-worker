@@ -6,4 +6,4 @@ public record GameBetFirstCommand(
 	Guid WalletId,
 	string ExternalBetId,
 	DateTimeOffset ExternalCreatedOn,
-	GameWagers.Common.Enums.BetState BetState);
+	Queue.Common.Enums.BetState BetState);

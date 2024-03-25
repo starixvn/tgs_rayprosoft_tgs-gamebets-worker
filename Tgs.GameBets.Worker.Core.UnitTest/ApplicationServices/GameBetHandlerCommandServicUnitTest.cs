@@ -1,10 +1,11 @@
 ﻿using System.Text.Json.Nodes;
 using NSubstitute;
+using Tgs.GameBets.Queue.Common.Enums;
 using Tgs.GameBets.Worker.Core.ApplicationServices;
-using Tgs.GameWagers.Common.Enums;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameBets.Worker.Core.UnitTest.ApplicationServices;
+
 public class GameBetHandlerCommandServicUnitTest
 {
 	[Fact]

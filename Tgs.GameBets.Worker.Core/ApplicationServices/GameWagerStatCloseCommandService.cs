@@ -2,6 +2,7 @@
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameBets.Worker.Core.ApplicationServices;
+
 internal class GameWagerStatCloseCommandService(
 	IStatisticalTimeUtnsil utnsil,
 	IGameWagerStatCloseRepository repository) : ICommandService<GameWagerStatCloseCommand>

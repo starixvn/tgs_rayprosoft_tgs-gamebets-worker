@@ -1,8 +1,10 @@
-﻿using Tgs.SerialNumberGenerator;
+﻿using Tgs.GameBets.Worker.Core.Models;
+
+using Tgs.SerialNumberGenerator;
 using Tgs.ServiceUtility;
-using Tgs.GameBets.Worker.Core.Models;
 
 namespace Tgs.GameBets.Worker.Core.ApplicationServices;
+
 internal class GameBetFirstCommandService(
 	IGameBetFirstRepository gameBetFirstRepository,
 	IGameBetRepository gameBetRepository,
@@ -11,7 +13,7 @@ internal class GameBetFirstCommandService(
 {
 	public async ValueTask ExecuteAsync(GameBetFirstCommand command, CancellationToken cancellationToken = default)
 	{
-		if (command.BetState is GameWagers.Common.Enums.BetState.Waiting or GameWagers.Common.Enums.BetState.Running)
+		if (command.BetState is Queue.Common.Enums.BetState.Waiting or Queue.Common.Enums.BetState.Running)
 		{
 			return;
 		}

@@ -1,6 +1,6 @@
-﻿using Tgs.ServiceUtility;
-using Tgs.GameBets.Worker.Core;
-using Tgs.GameBets.Worker.Core.JobApplicationServices;
+﻿using Tgs.GameBets.Worker.Core.JobApplicationServices;
+
+using Tgs.ServiceUtility;
 
 namespace Tgs.GameBets.Worker.Core;
 

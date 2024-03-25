@@ -1,17 +1,17 @@
 ﻿using Microsoft.Extensions.Logging;
-using Tgs.SerialNumberGenerator;
-using Tgs.ServiceUtility;
 using Tgs.GameBets.Worker.Core.Models;
-using Tgs.GameWagers.Common;
+
+using Tgs.ServiceUtility;
 
 namespace Tgs.GameBets.Worker.Core.ApplicationServices;
+
 internal class GameBetCommandService(
 	ILogger<GameBetCommandService> logger,
 	IGameBetRepository repository) : ICommandService<GameBetCommand>
 {
 	public async ValueTask ExecuteAsync(GameBetCommand command, CancellationToken cancellationToken = default)
 	{
-		if (command.BetState is GameWagers.Common.Enums.BetState.Waiting or GameWagers.Common.Enums.BetState.Running)
+		if (command.BetState is Queue.Common.Enums.BetState.Waiting or Queue.Common.Enums.BetState.Running)
 		{
 			return;
 		}
