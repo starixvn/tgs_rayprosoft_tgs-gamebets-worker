@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Tgs.GameBets.Worker;
 using Tgs.GameBets.Worker.Common;
 using Tgs.GameBets.Worker.Messages;
+using Tgs.GameBets.First.Worker.Common;
 
 var filterInstrumentations = new[] { "html", "ico", "png", "jpg" };
 
@@ -96,6 +97,7 @@ builder.Services
 	.ConfigureResolveConnection(sp => sp.GetRequiredKeyedService<NatsConnection>("Nats"))
 	.AddHandler<TriggerMessageHandler>(GameBetsWorkerNatsConst.GameBetsWorkerTrigger, typeof(TriggerMessageHandler).FullName!.ToLower()))
 	.ClearAllExchanges()
+	.AddNatsGlobPatternExchange(GameBetsFirstWorkerNatsConst.GameBetsFirstWorkerRequest)
 	.AddNatsGlobPatternExchange(GameBetsWorkerNatsConst.GameBetsWorkerTrigger)
 	.AddNatsGlobPatternExchange(GameBetsWorkerNatsConst.GameBetsWorkerStat);
 
