@@ -20,7 +20,7 @@ internal class GameBetsWorkerDispatcher(IServiceProvider serviceProvider) : IGam
 		using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cancellationTokenSource.Token);
 
 		var counter = _counters.GetOrAdd(
-			command.GameProviderCode,
+			string.Concat(command.GameProviderCode, "_", command.PageIndex),
 			key =>
 			{
 				var scope = serviceProvider.CreateScope();

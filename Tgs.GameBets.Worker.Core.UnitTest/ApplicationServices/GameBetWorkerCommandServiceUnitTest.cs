@@ -17,11 +17,13 @@ public class GameBetWorkerCommandServiceUnitTest
 		var fakeGameBetHandlerService = Substitute.For<ICommandService<GameBetHandlerCommand>>();
 
 		var command = new GameBetWorkerCommand(
-			"KY");
+			GameProviderCode: "KY",
+			PageIndex: 1);
 
 		_ = fakeGameBetQueueClient.QueryAsync(
 			gameProviderCode: Arg.Is(command.GameProviderCode),
-			limit: Arg.Any<int>(),
+			pageIndex: Arg.Is(command.PageIndex),
+			pageSize: Arg.Any<int>(),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(Enumerable.Empty<GameBetQueueInfoViewModel>().ToAsyncEnumerable());
 
@@ -52,7 +54,8 @@ public class GameBetWorkerCommandServiceUnitTest
 		var fakeGameBetHandlerService = Substitute.For<ICommandService<GameBetHandlerCommand>>();
 
 		var command = new GameBetWorkerCommand(
-			"KY");
+			GameProviderCode: "KY",
+			PageIndex: 1);
 
 		var externalRoundId = DateTimeOffset.UtcNow.AddSeconds(-5).ToUnixTimeMilliseconds().ToString();
 		var externalBetId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
@@ -103,7 +106,8 @@ public class GameBetWorkerCommandServiceUnitTest
 			ExpireOn: DateTimeOffset.UtcNow.AddHours(1));
 		_ = fakeGameBetQueueClient.QueryAsync(
 			gameProviderCode: Arg.Is(command.GameProviderCode),
-			limit: Arg.Any<int>(),
+			pageIndex: Arg.Is(command.PageIndex),
+			pageSize: Arg.Any<int>(),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(new GameBetQueueInfoViewModel[] { gameBetQueueInfo }.ToAsyncEnumerable(), Enumerable.Empty<GameBetQueueInfoViewModel>().ToAsyncEnumerable());
 

@@ -1,3 +1,4 @@
 ﻿namespace Tgs.GameBets.Worker.Core.ApplicationServices;
 public record GameBetWorkerCommand(
-	string GameProviderCode);
+	string GameProviderCode,
+	int PageIndex);
