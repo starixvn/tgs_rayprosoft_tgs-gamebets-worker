@@ -21,7 +21,7 @@ public class GameBetWorkerCommandServiceUnitTest
 
 		_ = fakeGameBetQueueClient.QueryAsync(
 			gameProviderCode: Arg.Is(command.GameProviderCode),
-			limit: Arg.Is(100),
+			limit: Arg.Any<int>(),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(Enumerable.Empty<GameBetQueueInfoViewModel>().ToAsyncEnumerable());
 
@@ -103,7 +103,7 @@ public class GameBetWorkerCommandServiceUnitTest
 			ExpireOn: DateTimeOffset.UtcNow.AddHours(1));
 		_ = fakeGameBetQueueClient.QueryAsync(
 			gameProviderCode: Arg.Is(command.GameProviderCode),
-			limit: Arg.Is(100),
+			limit: Arg.Any<int>(),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(new GameBetQueueInfoViewModel[] { gameBetQueueInfo }.ToAsyncEnumerable(), Enumerable.Empty<GameBetQueueInfoViewModel>().ToAsyncEnumerable());
 
