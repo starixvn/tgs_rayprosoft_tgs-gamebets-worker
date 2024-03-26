@@ -55,7 +55,7 @@ internal class JobInitCommandService : ICommandService<JobInitCommand>
 					options: _recurringJobOptions);
 
 				//初始化強制第一次處理
-				_ = BackgroundJob.Enqueue<IHangfireUtensil>(service => service.JobExecuteAsync(jobExecuteCommand));
+				//_ = BackgroundJob.Enqueue<IHangfireUtensil>(service => service.JobExecuteAsync(jobExecuteCommand));
 			}
 		}
 		catch (Exception ex)
