@@ -19,10 +19,11 @@ public class GameBetWorkerCommandServiceUnitTest
 		var command = new GameBetWorkerCommand(
 			"KY");
 
-		_ = fakeGameBetQueueClient.PopAsync(
-			gpCode: Arg.Is(command.GameProviderCode),
+		_ = fakeGameBetQueueClient.QueryAsync(
+			gameProviderCode: Arg.Is(command.GameProviderCode),
+			limit: Arg.Is(100),
 			cancellationToken: Arg.Any<CancellationToken>())
-			.Returns((GameBetQueueInfoViewModel?)null);
+			.Returns(Enumerable.Empty<GameBetQueueInfoViewModel>().ToAsyncEnumerable());
 
 		var sut = new GameBetWorkerCommandService(
 			fakeGameBetQueueClient,
@@ -38,9 +39,9 @@ public class GameBetWorkerCommandServiceUnitTest
 
 		_ = fakeGameBetQueueClient
 			.Received(0)
-			.RemoveAsync(
-			gpCode: Arg.Is(command.GameProviderCode),
-			source: Arg.Any<GameBetQueueRemoveViewModel>(),
+			.DeleteAsync(
+			gameProviderCode: Arg.Is(command.GameProviderCode),
+			id: Arg.Any<Guid>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 
@@ -59,6 +60,7 @@ public class GameBetWorkerCommandServiceUnitTest
 		var externalClosedOn = DateTimeOffset.UtcNow.AddSeconds(-5);
 		var externalPayoffOn = DateTimeOffset.UtcNow;
 		var gameBetQueueInfo = new GameBetQueueInfoViewModel(
+			Id: Guid.NewGuid(),
 			GameProviderId: Guid.NewGuid(),
 			GameProviderConfigurationId: Guid.NewGuid(),
 			GameId: 1,
@@ -96,11 +98,14 @@ public class GameBetWorkerCommandServiceUnitTest
 				["BetOn"] = externalCreatedOn,
 				["SettleOn"] = externalClosedOn,
 				["PayoffOn"] = externalPayoffOn
-			});
-		_ = fakeGameBetQueueClient.PopAsync(
-			gpCode: Arg.Is(command.GameProviderCode),
+			},
+			CreatedOn: DateTimeOffset.UtcNow,
+			ExpireOn: DateTimeOffset.UtcNow.AddHours(1));
+		_ = fakeGameBetQueueClient.QueryAsync(
+			gameProviderCode: Arg.Is(command.GameProviderCode),
+			limit: Arg.Is(100),
 			cancellationToken: Arg.Any<CancellationToken>())
-			.Returns(gameBetQueueInfo, (GameBetQueueInfoViewModel?)null);
+			.Returns(new GameBetQueueInfoViewModel[] { gameBetQueueInfo }.ToAsyncEnumerable(), Enumerable.Empty<GameBetQueueInfoViewModel>().ToAsyncEnumerable());
 
 		var sut = new GameBetWorkerCommandService(
 			fakeGameBetQueueClient,
@@ -145,42 +150,9 @@ public class GameBetWorkerCommandServiceUnitTest
 				AdditionalData: gameBetQueueInfo.AdditionalData)),
 			cancellationToken: Arg.Any<CancellationToken>());
 
-		_ = fakeGameBetQueueClient.RemoveAsync(
-			gpCode: Arg.Is(command.GameProviderCode),
-			source: Arg.Is(new GameBetQueueRemoveViewModel
-			{
-				GameProviderId = gameBetQueueInfo.GameProviderId,
-				GameProviderConfigurationId = gameBetQueueInfo.GameProviderConfigurationId,
-				GameId = gameBetQueueInfo.GameId,
-				ResellerId = gameBetQueueInfo.ResellerId,
-				LicenseeId = gameBetQueueInfo.LicenseeId,
-				BrandId = gameBetQueueInfo.BrandId,
-				PlayerCode = gameBetQueueInfo.PlayerCode,
-				CurrencyCode = gameBetQueueInfo.CurrencyCode,
-				WalletId = gameBetQueueInfo.WalletId,
-				ExternalRoundId = gameBetQueueInfo.ExternalRoundId,
-				ExternalBetId = gameBetQueueInfo.ExternalBetId,
-				ExternalCreatedOn = gameBetQueueInfo.ExternalCreatedOn,
-				ExternalClosedOn = gameBetQueueInfo.ExternalClosedOn,
-				ExternalPayoffOn = gameBetQueueInfo.ExternalPayoffOn,
-				ExternalResettleOn = gameBetQueueInfo.ExternalResettleOn,
-				BetState = gameBetQueueInfo.BetState,
-				BetType = gameBetQueueInfo.BetType,
-				FreeGameState = gameBetQueueInfo.FreeGameState,
-				GambleState = gameBetQueueInfo.GambleState,
-				CashoutState = gameBetQueueInfo.CashoutState,
-				ResettleState = gameBetQueueInfo.ResettleState,
-				JackpotState = gameBetQueueInfo.JackpotState,
-				CurrencyRatio = gameBetQueueInfo.CurrencyRatio,
-				Bet = gameBetQueueInfo.Bet,
-				ValidBet = gameBetQueueInfo.ValidBet,
-				Settle = gameBetQueueInfo.Settle,
-				Commission = gameBetQueueInfo.Commission,
-				Turnover = gameBetQueueInfo.Turnover,
-				WinLoss = gameBetQueueInfo.WinLoss,
-				Jackpot = gameBetQueueInfo.Jackpot,
-				AdditionalData = gameBetQueueInfo.AdditionalData
-			}),
+		_ = fakeGameBetQueueClient.DeleteAsync(
+			gameProviderCode: Arg.Is(command.GameProviderCode),
+			id: Arg.Is(gameBetQueueInfo.Id),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 }

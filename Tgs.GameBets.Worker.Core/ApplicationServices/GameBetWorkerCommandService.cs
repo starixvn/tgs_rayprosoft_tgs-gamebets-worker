@@ -1,4 +1,5 @@
-﻿using Tgs.GameBets.Queue.Client;
+﻿using System.Collections.Generic;
+using Tgs.GameBets.Queue.Client;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameBets.Worker.Core.ApplicationServices;
@@ -9,21 +10,21 @@ internal class GameBetWorkerCommandService(
 {
 	public async ValueTask ExecuteAsync(GameBetWorkerCommand command, CancellationToken cancellationToken = default)
 	{
-		GameBets.Queue.Common.ViewModels.GameBetQueueInfoViewModel? gameBetQueueInfo;
-
+		var limit = 100;
+		IEnumerable<Queue.Common.ViewModels.GameBetQueueInfoViewModel> gameBetQueueInfos;
 		do
 		{
-			gameBetQueueInfo = await client.PopAsync(
-				gpCode: command.GameProviderCode,
+			gameBetQueueInfos = await client.QueryAsync(
+				gameProviderCode: command.GameProviderCode,
+				limit: limit,
 				cancellationToken: cancellationToken)
-				.ConfigureAwait(false);
+				.ToArrayAsync(cancellationToken: cancellationToken)
+				.ConfigureAwait(false)
+				?? Enumerable.Empty<Queue.Common.ViewModels.GameBetQueueInfoViewModel>();
 
-			if (gameBetQueueInfo is null)
+			foreach (var gameBetQueueInfo in gameBetQueueInfos)
 			{
-				break;
-			}
-
-			await gameBetHandlerService.ExecuteAsync(
+				await gameBetHandlerService.ExecuteAsync(
 				command: new GameBetHandlerCommand(
 					GameProviderId: gameBetQueueInfo.GameProviderId,
 					GameProviderConfigurationId: gameBetQueueInfo.GameProviderConfigurationId,
@@ -59,44 +60,12 @@ internal class GameBetWorkerCommandService(
 				cancellationToken: cancellationToken)
 				.ConfigureAwait(false);
 
-			await client.RemoveAsync(
-				gpCode: command.GameProviderCode,
-				source: new Queue.Common.ViewModels.GameBetQueueRemoveViewModel
-				{
-					GameProviderId = gameBetQueueInfo.GameProviderId,
-					GameProviderConfigurationId = gameBetQueueInfo.GameProviderConfigurationId,
-					GameId = gameBetQueueInfo.GameId,
-					ResellerId = gameBetQueueInfo.ResellerId,
-					LicenseeId = gameBetQueueInfo.LicenseeId,
-					BrandId = gameBetQueueInfo.BrandId,
-					PlayerCode = gameBetQueueInfo.PlayerCode,
-					CurrencyCode = gameBetQueueInfo.CurrencyCode,
-					WalletId = gameBetQueueInfo.WalletId,
-					ExternalRoundId = gameBetQueueInfo.ExternalRoundId,
-					ExternalBetId = gameBetQueueInfo.ExternalBetId,
-					ExternalCreatedOn = gameBetQueueInfo.ExternalCreatedOn,
-					ExternalClosedOn = gameBetQueueInfo.ExternalClosedOn,
-					ExternalPayoffOn = gameBetQueueInfo.ExternalPayoffOn,
-					ExternalResettleOn = gameBetQueueInfo.ExternalResettleOn,
-					BetState = gameBetQueueInfo.BetState,
-					BetType = gameBetQueueInfo.BetType,
-					FreeGameState = gameBetQueueInfo.FreeGameState,
-					GambleState = gameBetQueueInfo.GambleState,
-					CashoutState = gameBetQueueInfo.CashoutState,
-					ResettleState = gameBetQueueInfo.ResettleState,
-					JackpotState = gameBetQueueInfo.JackpotState,
-					CurrencyRatio = gameBetQueueInfo.CurrencyRatio,
-					Bet = gameBetQueueInfo.Bet,
-					ValidBet = gameBetQueueInfo.ValidBet,
-					Settle = gameBetQueueInfo.Settle,
-					Commission = gameBetQueueInfo.Commission,
-					Turnover = gameBetQueueInfo.Turnover,
-					WinLoss = gameBetQueueInfo.WinLoss,
-					Jackpot = gameBetQueueInfo.Jackpot,
-					AdditionalData = gameBetQueueInfo.AdditionalData
-				},
-				cancellationToken: cancellationToken)
-				.ConfigureAwait(false);
-		} while (gameBetQueueInfo is not null);
+				await client.DeleteAsync(
+					gameProviderCode: command.GameProviderCode,
+					id: gameBetQueueInfo.Id,
+					cancellationToken: cancellationToken)
+					.ConfigureAwait(false);
+			}
+		} while (gameBetQueueInfos.Any());
 	}
 }
