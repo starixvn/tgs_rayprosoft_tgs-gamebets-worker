@@ -18,7 +18,6 @@ internal class TriggerMessageHandler(
 			subject,
 			data);
 
-
 		return dispatcher.PushCommandAsync(
 			command: new GameBetWorkerCommand(
 				GameProviderCode: data.GameProviderCode,

@@ -94,9 +94,10 @@ builder.Services
 	.AddMessageQueue()
 	.AddNatsMessageQueue(config => config
 	.ConfigureResolveConnection(sp => sp.GetRequiredKeyedService<NatsConnection>("Nats"))
-	.AddHandler<TriggerMessageHandler>(GameBetsWorkerNatsConst.Trigger, typeof(TriggerMessageHandler).FullName!.ToLower()))
+	.AddHandler<TriggerMessageHandler>(GameBetsWorkerNatsConst.GameBetsWorkerTrigger, typeof(TriggerMessageHandler).FullName!.ToLower()))
 	.ClearAllExchanges()
-	.AddNatsGlobPatternExchange(GameBetsWorkerNatsConst.Trigger);
+	.AddNatsGlobPatternExchange(GameBetsWorkerNatsConst.GameBetsWorkerTrigger)
+	.AddNatsGlobPatternExchange(GameBetsWorkerNatsConst.GameBetsWorkerStat);
 
 builder.Services
 	.AddOpenTelemetry()

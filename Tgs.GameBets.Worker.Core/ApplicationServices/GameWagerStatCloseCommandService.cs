@@ -1,34 +1,27 @@
-﻿using Tgs.GameBets.Worker.Core.Models;
+﻿using Google.Protobuf.WellKnownTypes;
+using Tgs.GameBets.Worker.Common;
+using Tgs.GameBets.Worker.Common.Protos;
+using Tgs.GameBets.Worker.Core.Models;
 using Tgs.ServiceUtility;
+using Valhalla.MessageQueue;
 
 namespace Tgs.GameBets.Worker.Core.ApplicationServices;
 
 internal class GameWagerStatCloseCommandService(
-	IStatisticalTimeUtnsil utnsil,
-	IGameWagerStatCloseRepository repository) : ICommandService<GameWagerStatCloseCommand>
+	IMessageSender messageSender) : ICommandService<GameWagerStatCloseCommand>
 {
 	public ValueTask ExecuteAsync(GameWagerStatCloseCommand command, CancellationToken cancellationToken = default)
-	{
-		var statOn = utnsil.GetStatOn(command.ClosedOn);
-
-		return repository.AddAsync(
-			source: new GameWagerStatCloseAdd(
-				GameProviderId: command.GameProviderId,
-				GameId: command.GameId,
-				ResellerId: command.ResellerId,
-				LicenseeId: command.LicenseeId,
-				BrandId: command.BrandId,
-				PlayerCode: command.PlayerCode,
-				WalletId: command.WalletId,
-				ExternalRoundId: command.ExternalRoundId,
-				ExternalBetId: command.ExternalBetId,
-				StatOn: statOn,
-				Bet: command.Bet,
-				ValidBet: command.ValidBet,
-				Settle: command.Settle,
-				Commission: command.Commission,
-				Turnover: command.Turnover,
-				WinLoss: command.WinLoss),
-			cancellationToken: cancellationToken);
-	}
+	=> messageSender.PublishAsync(
+		subject: GameBetsWorkerNatsConst.GameBetsWorkerStat,
+		data: new GameBetsWorkerStatMessage
+		{
+			GameProviderId = command.GameProviderId,
+			GameId = command.GameId,
+			PlayerCode = command.PlayerCode,
+			WalletId = command.WalletId,
+			ExternalRoundId = command.ExternalRoundId,
+			ExternalBetId = command.ExternalBetId,
+			ExternalCreatedOn = command.ExternalCreatedOn.ToTimestamp()
+		},
+		cancellationToken: cancellationToken);
 }

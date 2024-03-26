@@ -152,20 +152,11 @@ public class GameBetFirstCommandServiceUnitTest
 			command: new GameWagerStatCloseCommand(
 				GameProviderId: model.GameProviderId,
 				GameId: model.GameId,
-				ResellerId: model.ResellerId,
-				LicenseeId: model.LicenseeId,
-				BrandId: model.BrandId,
 				PlayerCode: model.PlayerCode,
 				WalletId: model.WalletId,
 				ExternalRoundId: model.ExternalRoundId,
 				ExternalBetId: model.ExternalBetId,
-				Bet: model.Bet,
-				ValidBet: model.ValidBet,
-				Settle: model.Settle,
-				Commission: model.Commission,
-				Turnover: model.Turnover,
-				WinLoss: model.WinLoss,
-				ClosedOn: model.ClosedOn),
+				ExternalCreatedOn: model.ExternalCreatedOn),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 

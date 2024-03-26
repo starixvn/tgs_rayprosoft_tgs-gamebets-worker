@@ -89,20 +89,11 @@ internal class GameBetFirstCommandService(
 			command: new GameWagerStatCloseCommand(
 				model.GameProviderId,
 				model.GameId,
-				model.ResellerId,
-				model.LicenseeId,
-				model.BrandId,
 				model.PlayerCode,
 				model.WalletId,
 				model.ExternalRoundId,
 				model.ExternalBetId,
-				model.Bet,
-				model.ValidBet,
-				model.Settle,
-				model.Commission,
-				model.Turnover,
-				model.WinLoss,
-				model.ClosedOn),
+				model.ExternalCreatedOn),
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 	}

@@ -15,7 +15,7 @@ public class GameBetsWorkerController : ControllerBase
 		[FromServices] IMessageSender messageSender,
 		string gameProviderCode)
 		=> messageSender.PublishAsync(
-			subject: GameBetsWorkerNatsConst.Trigger,
+			subject: GameBetsWorkerNatsConst.GameBetsWorkerTrigger,
 			data: new GameBetsWorkerMessage
 			{
 				GameProviderCode = gameProviderCode,

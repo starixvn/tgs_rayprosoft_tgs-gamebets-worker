@@ -2,5 +2,7 @@
 
 public class GameBetsWorkerNatsConst
 {
-	public const string Trigger = "game.gamebet.worker.trigger";
+	public const string GameBetsWorkerTrigger = "game.gamebet.worker.trigger";
+
+	public const string GameBetsWorkerStat = "game.gamebet.worker.stat";
 }

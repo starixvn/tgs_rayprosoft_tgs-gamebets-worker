@@ -1,8 +1,8 @@
 ﻿syntax = "proto3";
 
-//import "phoenix/protobuf/guid.proto";
+import "phoenix/protobuf/guid.proto";
 //import "phoenix/protobuf/decimal.proto";
-//import "google/protobuf/timestamp.proto";
+import "google/protobuf/timestamp.proto";
 
 option csharp_namespace = "Tgs.GameBets.Worker.Common.Protos";
 
@@ -15,4 +15,21 @@ package GameBetsWorkerCommon;
 message GameBetsWorkerMessage {
     
     string game_provider_code = 1;
+}
+
+message GameBetsWorkerStatMessage {
+    // 遊戲供應商識別碼
+    phoenix.protobuf.GuidValue game_provider_id = 1;
+    // 遊戲識別碼
+    int32 game_id = 2;
+    // 玩家識別碼
+    string player_code = 3;
+    // 錢包識別碼
+    phoenix.protobuf.GuidValue wallet_id = 4;
+    // 三方局/回合識別碼
+    string external_round_id = 5;
+    // 三方投注識別碼
+    string external_bet_id = 6;
+    // 三方投注創建時間
+    google.protobuf.Timestamp external_created_on = 7;
 }

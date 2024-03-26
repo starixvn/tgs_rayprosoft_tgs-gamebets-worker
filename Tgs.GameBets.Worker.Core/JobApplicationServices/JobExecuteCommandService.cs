@@ -20,11 +20,11 @@ internal class JobExecuteCommandService(
 
 		logger.LogInformation("LogOn:{logOn} Subject:{subject} Message:This publish message.({message})",
 			DateTime.Now.ToString("u"),
-			GameBetsWorkerNatsConst.Trigger,
+			GameBetsWorkerNatsConst.GameBetsWorkerTrigger,
 			message);
 
 		return messageSender.PublishAsync(
-			subject: GameBetsWorkerNatsConst.Trigger,
+			subject: GameBetsWorkerNatsConst.GameBetsWorkerTrigger,
 			data: message,
 			cancellationToken: cancellationToken);
 	}
