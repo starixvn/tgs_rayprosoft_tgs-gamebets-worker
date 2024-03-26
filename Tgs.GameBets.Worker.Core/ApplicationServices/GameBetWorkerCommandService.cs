@@ -9,7 +9,7 @@ internal class GameBetWorkerCommandService(
 {
 	public async ValueTask ExecuteAsync(GameBetWorkerCommand command, CancellationToken cancellationToken = default)
 	{
-		var pageSize = 1000;
+		var pageSize = 100;
 		IEnumerable<Queue.Common.ViewModels.GameBetQueueInfoViewModel> gameBetQueueInfos;
 
 		gameBetQueueInfos = await client.QueryAsync(

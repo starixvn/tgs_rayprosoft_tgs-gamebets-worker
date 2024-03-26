@@ -18,7 +18,7 @@ internal class TriggerMessageHandler(
 			subject,
 			data);
 
-		for (var pageIndex = 1; pageIndex <= 5; pageIndex++)
+		for (var pageIndex = 1; pageIndex <= 10; pageIndex++)
 		{
 			await dispatcher.PushCommandAsync(
 				command: new GameBetWorkerCommand(
