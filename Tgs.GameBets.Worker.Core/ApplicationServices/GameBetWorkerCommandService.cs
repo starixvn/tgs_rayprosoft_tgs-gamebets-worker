@@ -21,6 +21,7 @@ internal class GameBetWorkerCommandService(
 			.ConfigureAwait(false)
 			?? Enumerable.Empty<Queue.Common.ViewModels.GameBetQueueInfoViewModel>();
 
+		var tempDeletes = new List<Guid>();
 		foreach (var gameBetQueueInfo in gameBetQueueInfos)
 		{
 			await gameBetHandlerService.ExecuteAsync(
@@ -59,9 +60,15 @@ internal class GameBetWorkerCommandService(
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 
+			tempDeletes.Add(gameBetQueueInfo.Id);
+
+		}
+
+		foreach (var tempDelete in tempDeletes)
+		{
 			await client.DeleteAsync(
 				gameProviderCode: command.GameProviderCode,
-				id: gameBetQueueInfo.Id,
+				id: tempDelete,
 				cancellationToken: cancellationToken)
 				.ConfigureAwait(false);
 		}
