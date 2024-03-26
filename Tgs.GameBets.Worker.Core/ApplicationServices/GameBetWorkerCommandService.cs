@@ -10,7 +10,7 @@ internal class GameBetWorkerCommandService(
 {
 	public async ValueTask ExecuteAsync(GameBetWorkerCommand command, CancellationToken cancellationToken = default)
 	{
-		var limit = 100;
+		var limit = 1000;
 		IEnumerable<Queue.Common.ViewModels.GameBetQueueInfoViewModel> gameBetQueueInfos;
 		do
 		{
