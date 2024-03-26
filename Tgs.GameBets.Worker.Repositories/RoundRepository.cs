@@ -10,6 +10,8 @@ internal class RoundRepository(
 {
 	public async ValueTask AddAsync(RoundAddModel source, CancellationToken cancellationToken = default)
 	{
+		context.ChangeTracker.Clear();
+
 		var round = new Round()
 		{
 			Id = source.Id,
@@ -48,6 +50,8 @@ internal class RoundRepository(
 
 	public async ValueTask ClosedAsync(Guid id, RoundClosedModel source, CancellationToken cancellationToken = default)
 	{
+		context.ChangeTracker.Clear();
+
 		var round = await context.Rounds.SingleAsync(
 			predicate: x => x.Id == id,
 			cancellationToken: cancellationToken)
@@ -141,6 +145,8 @@ internal class RoundRepository(
 
 	public async ValueTask MergeDetailAsync(Guid id, string additionalData, CancellationToken cancellationToken = default)
 	{
+		context.ChangeTracker.Clear();
+
 		var roundDetail = await context.RoundDetails
 			.FirstOrDefaultAsync(
 			predicate: x => x.RoundId == id,
@@ -174,6 +180,8 @@ internal class RoundRepository(
 
 	public async ValueTask OpenAsync(Guid id, RoundOpenModel source, CancellationToken cancellationToken = default)
 	{
+		context.ChangeTracker.Clear();
+
 		var round = await context.Rounds.SingleAsync(
 			predicate: x => x.Id == id,
 			cancellationToken: cancellationToken)
@@ -194,6 +202,8 @@ internal class RoundRepository(
 
 	public async ValueTask ReopenAsync(Guid id, RoundReopenModel source, CancellationToken cancellationToken = default)
 	{
+		context.ChangeTracker.Clear();
+
 		var round = await context.Rounds.SingleAsync(
 			predicate: x => x.Id == id,
 			cancellationToken: cancellationToken)

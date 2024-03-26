@@ -10,6 +10,8 @@ internal class GameBetFirstRepository(
 {
 	public async ValueTask AddAsync(GameBetFirstAddModel source, CancellationToken cancellationToken = default)
 	{
+		context.ChangeTracker.Clear();
+
 		var entity = new GameBetFirst
 		{
 			Id = source.Id,

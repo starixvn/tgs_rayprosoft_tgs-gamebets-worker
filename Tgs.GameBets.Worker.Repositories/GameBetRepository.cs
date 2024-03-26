@@ -11,6 +11,8 @@ internal class GameBetRepository(
 {
 	public async ValueTask AddAsync(GameBetAddModel source, CancellationToken cancellationToken = default)
 	{
+		context.ChangeTracker.Clear();
+
 		var entity = new GameBet
 		{
 			Id = source.Id,
@@ -121,6 +123,8 @@ internal class GameBetRepository(
 
 	public async ValueTask UpdateAsync(GameBetUpdateModel source, CancellationToken cancellationToken = default)
 	{
+		context.ChangeTracker.Clear();
+
 		var entity = await context.GameBets
 			.Where(gws => gws.ExternalCreatedOn >= source.ExternalCreatedOn.AddDays(-7) &&
 			gws.Id == source.Id)

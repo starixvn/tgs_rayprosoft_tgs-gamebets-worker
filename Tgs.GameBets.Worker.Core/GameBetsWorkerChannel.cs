@@ -11,7 +11,7 @@ namespace Tgs.GameBets.Worker.Core;
 internal class GameBetsWorkerChannel(
 	string gameProviderCode,
 	ILogger<GameBetsWorkerChannel> logger,
-	IServiceProvider serviceProvider) : IDisposable, IAsyncDisposable
+	ICommandService<GameBetWorkerCommand> service) : IDisposable, IAsyncDisposable
 {
 	private static readonly ActivitySource _ActivitySource = new(name: typeof(GameBetsWorkerChannel).FullName!);
 
@@ -120,8 +120,9 @@ internal class GameBetsWorkerChannel(
 					parentContext: default);
 				try
 				{
-					using var scope = serviceProvider.CreateScope();
+					/*using var scope = serviceProvider.CreateScope();
 					var service = scope.ServiceProvider.GetRequiredService<ICommandService<GameBetWorkerCommand>>();
+					*/
 					await service.ExecuteAsync(
 						command: command,
 						cancellationToken: cancellationToken)
