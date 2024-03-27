@@ -1,4 +1,4 @@
-﻿namespace Tgs.GameBets.First.Worker.Common;
+﻿namespace Tgs.GameBets.Worker.Common;
 
 public class GameBetsWorkerNatsConst
 {

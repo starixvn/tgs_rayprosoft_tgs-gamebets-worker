@@ -9,7 +9,9 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Tgs.GameBets.First.Worker.Common;
+
 using Tgs.GameBets.First.Worker.Messages;
+using Tgs.GameBets.Worker.Common;
 using Tgs.MessageQueue.Nats.Serializers;
 
 var filterInstrumentations = new[] { "html", "ico", "png", "jpg" };

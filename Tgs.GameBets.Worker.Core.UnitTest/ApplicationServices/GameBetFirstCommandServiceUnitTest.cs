@@ -2,7 +2,6 @@
 using Google.Protobuf.WellKnownTypes;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
-
 using Tgs.GameBets.First.Worker.Common;
 using Tgs.GameBets.First.Worker.Common.Protos;
 using Tgs.GameBets.Worker.Core.ApplicationServices;
