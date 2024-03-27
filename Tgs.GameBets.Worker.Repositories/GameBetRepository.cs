@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Tgs.GameBets.Queue.Common.Enums;
 using Tgs.GameBets.Worker.Core;
 using Tgs.GameBets.Worker.Core.Models;
 using Tgs.GameBets.Worker.Entities;
@@ -11,8 +10,6 @@ internal class GameBetRepository(
 {
 	public async ValueTask AddAsync(GameBetAddModel source, CancellationToken cancellationToken = default)
 	{
-		context.ChangeTracker.Clear();
-
 		var entity = new GameBet
 		{
 			Id = source.Id,
@@ -49,7 +46,7 @@ internal class GameBetRepository(
 			CreatedOn = DateTime.UtcNow,
 			ClosedOn = DateTime.UtcNow,
 			UpdatedOn = DateTime.UtcNow,
-			ResetState = (int)ResetState.None,
+			ResetState = (int)Common.Protos.ResetState.None,
 			ResetOn = DateTimeOffset.UnixEpoch.UtcDateTime,
 			AdditionalData = source.AdditionalData.ToJsonString()
 		};
@@ -98,13 +95,13 @@ internal class GameBetRepository(
 			gws.ExternalClosedOn,
 			gws.ExternalPayoffOn,
 			gws.ExternalResettleOn,
-			(BetState)gws.BetState,
-			(BetType)gws.BetType,
-			(FreeGameState)gws.FreeGameState,
-			(GambleState)gws.GambleState,
-			(CashoutState)gws.CashoutState,
-			(ResettleState)gws.ResettleState,
-			(JackpotState)gws.JackpotState,
+			(Common.Protos.BetState)gws.BetState,
+			(Common.Protos.BetType)gws.BetType,
+			(Common.Protos.FreeGameState)gws.FreeGameState,
+			(Common.Protos.GambleState)gws.GambleState,
+			(Common.Protos.CashoutState)gws.CashoutState,
+			(Common.Protos.ResettleState)gws.ResettleState,
+			(Common.Protos.JackpotState)gws.JackpotState,
 			gws.CurrencyRatio,
 			gws.Bet,
 			gws.ValidBet,
@@ -123,8 +120,6 @@ internal class GameBetRepository(
 
 	public async ValueTask UpdateAsync(GameBetUpdateModel source, CancellationToken cancellationToken = default)
 	{
-		context.ChangeTracker.Clear();
-
 		var entity = await context.GameBets
 			.Where(gws => gws.ExternalCreatedOn >= source.ExternalCreatedOn.AddDays(-7) &&
 			gws.Id == source.Id)
@@ -145,7 +140,7 @@ internal class GameBetRepository(
 		entity.Turnover = source.Turnover;
 		entity.WinLoss = source.WinLoss;
 		entity.ExternalResettleOn = source.ExternalResettleOn.UtcDateTime;
-		entity.ResetState = (int)ResetState.Reset;
+		entity.ResetState = (int)Common.Protos.ResetState.Reset;
 		entity.ResetOn = DateTime.UtcNow;
 		entity.UpdatedOn = DateTime.UtcNow;
 		entity.AdditionalData = source.AdditionalData.ToJsonString();

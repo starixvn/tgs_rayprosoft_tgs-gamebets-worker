@@ -3,17 +3,14 @@ using System.Text.Json.Serialization;
 using Hangfire;
 using Hangfire.Redis.StackExchange;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NATS.Client.Core;
 using OpenTelemetry.Metrics;
-
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using Tgs.MessageQueue.Nats.Serializers;
-using Microsoft.EntityFrameworkCore;
-using Tgs.GameBets.Worker;
-using Tgs.GameBets.Worker.Common;
-using Tgs.GameBets.Worker.Messages;
 using Tgs.GameBets.First.Worker.Common;
+using Tgs.GameBets.First.Worker.Messages;
+using Tgs.MessageQueue.Nats.Serializers;
 
 var filterInstrumentations = new[] { "html", "ico", "png", "jpg" };
 
@@ -78,13 +75,7 @@ builder.Services.AddGameBetsWorker(
 	{
 		var configuration = sp.GetRequiredService<IConfiguration>();
 		options.ConnectionString = configuration.GetConnectionString("Redis")!;
-	})
-	.AddGameBetQueueClient((httpClientBuilder) =>
-	httpClientBuilder.ConfigureHttpClient((sp, http) =>
-	{
-		var configuration = sp.GetRequiredService<IConfiguration>();
-		http.BaseAddress = configuration.GetValue<Uri>("GameBetsWorkerConnectionStrings:GameBetQueueClientBaseUrl")!;
-	}));
+	});
 
 builder.Services
 	.AddKeyedSingleton("Nats", (sp, _) => new NatsConnection(NatsOpts.Default with
@@ -95,11 +86,10 @@ builder.Services
 	.AddMessageQueue()
 	.AddNatsMessageQueue(config => config
 	.ConfigureResolveConnection(sp => sp.GetRequiredKeyedService<NatsConnection>("Nats"))
-	.AddHandler<TriggerMessageHandler>(GameBetsWorkerNatsConst.GameBetsWorkerTrigger, typeof(TriggerMessageHandler).FullName!.ToLower()))
+	.AddHandler<GameBetsWorkerMessageHandler>(GameBetsWorkerNatsConst.GameBetsWorkerRequest, typeof(GameBetsWorkerMessageHandler).FullName!.ToLower()))
 	.ClearAllExchanges()
-	.AddNatsGlobPatternExchange(GameBetsFirstWorkerNatsConst.GameBetsFirstWorkerRequest)
-	.AddNatsGlobPatternExchange(GameBetsWorkerNatsConst.GameBetsWorkerTrigger)
-	.AddNatsGlobPatternExchange(GameBetsWorkerNatsConst.GameBetsWorkerStat);
+	.AddNatsGlobPatternExchange(GameBetsWorkerNatsConst.GameBetsWorkerRequest)
+	.AddNatsGlobPatternExchange(GameBetsFirstWorkerNatsConst.GameBetsFirstWorkerRequest);
 
 builder.Services
 	.AddOpenTelemetry()
@@ -139,22 +129,9 @@ var app = builder.Build();
 _ = app.UseSwagger();
 _ = app.UseSwaggerUI();
 
-app.UseHangfireDashboard(
-	"/hangfire",
-	new DashboardOptions()
-	{
-		Authorization =
-		new[]
-		{
-			new IgnoreHangfireAuthorizationFilter()
-		}
-	});
-
 _ = app.MapControllers();
 _ = app.MapSwagger();
 
 app.UseHealthChecks("/healthz");
-
-_ = app.UseHangfireRegisterAsync();
 
 app.Run();

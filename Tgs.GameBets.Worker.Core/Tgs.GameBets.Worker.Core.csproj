@@ -7,16 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.61.0" />
     <PackageReference Include="Hangfire.AspNetCore" Version="1.8.11" />
     <PackageReference Include="Hangfire.Dashboard.Management" Version="1.7.9" />
     <PackageReference Include="Hangfire.Redis.StackExchange" Version="1.9.3" />
     <PackageReference Include="PhoenixToolkits.MessageQueue" Version="2.1.0" />
     <PackageReference Include="PhoenixToolkits.MessageQueue.Nats" Version="2.1.2" />
+    <PackageReference Include="PhoenixToolkits.Protobuf.ExtendTypes" Version="0.0.7" />
     <PackageReference Include="Scrutor" Version="4.2.2" />
     <PackageReference Include="Tgs.GameBets.First.Worker.Client" Version="1.0.3" />
-    <PackageReference Include="Tgs.GameBets.Queue.Client" Version="1.0.4" />
     <PackageReference Include="Tgs.MessageQueue.Nats.Serializers" Version="0.0.2" />
-    <PackageReference Include="Tgs.SerialNumberGenerator" Version="1.0.1" />
     <PackageReference Include="TGS.ServiceUtility" Version="0.2.0" />
   </ItemGroup>
 

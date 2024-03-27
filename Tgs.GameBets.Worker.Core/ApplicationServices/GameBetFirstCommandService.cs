@@ -12,11 +12,6 @@ internal class GameBetFirstCommandService(
 {
 	public async ValueTask ExecuteAsync(GameBetFirstCommand command, CancellationToken cancellationToken = default)
 	{
-		if (command.BetState is Queue.Common.Enums.BetState.Waiting or Queue.Common.Enums.BetState.Running)
-		{
-			return;
-		}
-
 		var model = await gameBetRepository.GetAsync(
 			gameProviderId: command.GameProviderId,
 			gameId: command.GameId,

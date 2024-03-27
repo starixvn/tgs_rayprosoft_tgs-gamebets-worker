@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Nodes;
-using Tgs.GameBets.Queue.Common.Enums;
 
 namespace Tgs.GameBets.Worker.Core.Models;
 public record GameBetAddModel(
@@ -19,13 +18,13 @@ public record GameBetAddModel(
 	DateTimeOffset ExternalClosedOn,
 	DateTimeOffset ExternalPayoffOn,
 	DateTimeOffset ExternalResettleOn,
-	BetState BetState,
-	BetType BetType,
-	FreeGameState FreeGameState,
-	GambleState GambleState,
-	CashoutState CashoutState,
-	ResettleState ResettleState,
-	JackpotState JackpotState,
+	Common.Protos.BetState BetState,
+	Common.Protos.BetType BetType,
+	Common.Protos.FreeGameState FreeGameState,
+	Common.Protos.GambleState GambleState,
+	Common.Protos.CashoutState CashoutState,
+	Common.Protos.ResettleState ResettleState,
+	Common.Protos.JackpotState JackpotState,
 	decimal CurrencyRatio,
 	decimal Bet,
 	decimal ValidBet,

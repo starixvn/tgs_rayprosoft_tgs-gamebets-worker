@@ -1,8 +1,6 @@
-﻿namespace Tgs.GameBets.Worker.Common;
+﻿namespace Tgs.GameBets.First.Worker.Common;
 
 public class GameBetsWorkerNatsConst
 {
-	public const string GameBetsWorkerTrigger = "game.gamebet.worker.trigger";
-
-	public const string GameBetsWorkerStat = "game.gamebet.worker.stat";
+	public const string GameBetsWorkerRequest = "game.gamebet.first.worker.request";
 }

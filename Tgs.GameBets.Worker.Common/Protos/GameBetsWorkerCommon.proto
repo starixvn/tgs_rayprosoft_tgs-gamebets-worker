@@ -1,7 +1,7 @@
 ﻿syntax = "proto3";
 
 import "phoenix/protobuf/guid.proto";
-//import "phoenix/protobuf/decimal.proto";
+import "phoenix/protobuf/decimal.proto";
 import "google/protobuf/timestamp.proto";
 
 option csharp_namespace = "Tgs.GameBets.Worker.Common.Protos";
@@ -12,24 +12,110 @@ package GameBetsWorkerCommon;
 
 
 // The request message containing the user's name.
-message GameBetsWorkerMessage {
-    
-    string game_provider_code = 1;
+message GameBetsWorkerRequest {
+    phoenix.protobuf.GuidValue game_bet_id = 1;
+	phoenix.protobuf.GuidValue game_provider_id = 2;
+	phoenix.protobuf.GuidValue game_provider_configuration_id = 3;
+	int32 game_id = 4;
+	phoenix.protobuf.GuidValue reseller_id = 5;
+	phoenix.protobuf.GuidValue licensee_id = 6;
+	phoenix.protobuf.GuidValue brand_id = 7;
+	string player_code  = 8;
+	string currency_code = 9;
+	phoenix.protobuf.GuidValue wallet_id = 10;
+	string external_round_id = 11;
+	string external_bet_id = 12;
+	google.protobuf.Timestamp external_created_on = 13;
+	google.protobuf.Timestamp external_closed_on = 14;
+	google.protobuf.Timestamp external_payoff_on = 15;
+	google.protobuf.Timestamp external_resettle_on = 16;
+	BetState bet_state =17;
+	BetType bet_type = 18;
+	FreeGameState free_game_state = 19;
+	GambleState gamble_state = 20;
+	CashoutState cashout_state = 21;
+	ResettleState resettle_state = 22;
+	JackpotState jackpot_state = 23;
+	phoenix.protobuf.DecimalValue currency_ratio = 24;
+	phoenix.protobuf.DecimalValue bet = 25;
+	phoenix.protobuf.DecimalValue valid_bet = 26;
+	phoenix.protobuf.DecimalValue settle = 27;
+	phoenix.protobuf.DecimalValue commission = 28;
+	phoenix.protobuf.DecimalValue turnover = 29;
+	phoenix.protobuf.DecimalValue win_loss = 30;
+	phoenix.protobuf.DecimalValue jackpot = 31;
+	google.protobuf.Timestamp created_on = 32;
+	google.protobuf.Timestamp closed_on = 33;
+	google.protobuf.Timestamp updated_on = 34;
+	string additional_data = 35;
 }
 
-message GameBetsWorkerStatMessage {
-    // 遊戲供應商識別碼
-    phoenix.protobuf.GuidValue game_provider_id = 1;
-    // 遊戲識別碼
-    int32 game_id = 2;
-    // 玩家識別碼
-    string player_code = 3;
-    // 錢包識別碼
-    phoenix.protobuf.GuidValue wallet_id = 4;
-    // 三方局/回合識別碼
-    string external_round_id = 5;
-    // 三方投注識別碼
-    string external_bet_id = 6;
-    // 三方投注創建時間
-    google.protobuf.Timestamp external_created_on = 7;
+// 注單狀態
+enum BetState{
+    //等待中: 我们交易员因为可能因为赔率的转换等因素，还未接受这张注单。
+    BET_STATE_WAITING = 0;
+    //進行中: 此註單還沒有結算。(注單還沒有結算的狀態有可能是這場比賽還沒有結算之類的情形。)
+    BET_STATE_RUNNING = 1;
+    //作廢: 在註單為 RUNNING 的狀態下，玩家下註註金返回。原因可能為我們交易員對此場賽事有些疑慮。可與我們聯繫詢問發生什麼狀況。
+    BET_STATE_VOID= 2;
+    //退款: 在註單為 RUNNING 的狀態下，玩家下註註金返回。原因有可能是賽事取消或發生什麼意外。
+    BET_STATE_REFUND = 3;
+    //已取消: 在註單為 WAITING 的狀態下，玩家下註註金返回。可能狀況很多。
+    BET_STATE_REJECT = 4;
+    //輸: 此註單已結算且玩家輸了此註單。
+    BET_STATE_LOSE = 5;
+    //贏: 此注单已结算且玩家赢了此注单。
+    BET_STATE_WIN = 6;
+    //和局: 此註單已結算且此註單為和局。
+    BET_STATE_DRAW = 7;
+    //半赢: 此註單已結算且玩家贏了下注額一半。
+    BET_STATE_HALF_WIN = 8;
+    //半輸:  此註單已結算且玩家輸了下注額一半。
+    BET_STATE_HALF_LOSE = 9;
+}
+
+// 注單類型
+enum BetType {
+    //正常
+    BET_TYPE_NORMAL = 0;
+}
+
+// 免費遊戲狀態
+enum FreeGameState{
+    FREE_GAME_STATE_NONE = 0;
+    FREE_GAME_STATE_FREE_GAME = 1;
+}
+
+// 博取遊戲
+enum GambleState{
+    GAMBLE_STATE_NONE = 0;
+    GAMBLE_STATE_GAMBLE = 1;
+}
+
+// 兌現狀態
+enum CashoutState{
+    CASHOUT_STATE_NONE = 0;
+    CASHOUT_STATE_CASHOUT = 1;
+}
+
+// 重新结算狀態
+enum ResettleState{
+    RESETTLE_STATE_NONE = 0;
+    RESETTLE_STATE_RESETTLE = 1;
+}
+
+/// <summary>
+/// 彩金狀態
+/// </summary>
+enum JackpotState{
+	JACKPOT_STATE_NONE = 0;
+	JACKPOT_STATE_JACKPOT = 1;
+}
+
+/// <summary>
+/// 重置狀態
+/// </summary>
+enum ResetState{
+	RESET_STATE_NONE = 0;
+	RESET_STATE_RESET = 1;
 }

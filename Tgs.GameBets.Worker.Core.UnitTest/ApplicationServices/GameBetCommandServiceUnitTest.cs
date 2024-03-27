@@ -1,7 +1,6 @@
 ﻿using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
-using Tgs.GameBets.Queue.Common.Enums;
 using Tgs.GameBets.Worker.Core.ApplicationServices;
 using Tgs.GameBets.Worker.Core.Models;
 
@@ -22,7 +21,7 @@ public class GameBetCommandServiceUnitTest
 		var externalPayoffOn = DateTimeOffset.UtcNow;
 
 		var command = new GameBetCommand(
-			Id: Guid.NewGuid(),
+			GameBetId: Guid.NewGuid(),
 			GameProviderId: Guid.NewGuid(),
 			GameProviderConfigurationId: Guid.NewGuid(),
 			GameId: 1,
@@ -38,13 +37,13 @@ public class GameBetCommandServiceUnitTest
 			ExternalClosedOn: externalClosedOn,
 			ExternalPayoffOn: externalPayoffOn,
 			ExternalResettleOn: DateTimeOffset.UnixEpoch,
-			BetState: BetState.Win,
-			BetType: BetType.Normal,
-			FreeGameState: FreeGameState.None,
-			GambleState: GambleState.None,
-			CashoutState: CashoutState.None,
-			ResettleState: ResettleState.None,
-			JackpotState: JackpotState.None,
+			BetState: Common.Protos.BetState.Win,
+			BetType: Common.Protos.BetType.Normal,
+			FreeGameState: Common.Protos.FreeGameState.None,
+			GambleState: Common.Protos.GambleState.None,
+			CashoutState: Common.Protos.CashoutState.None,
+			ResettleState: Common.Protos.ResettleState.None,
+			JackpotState: Common.Protos.JackpotState.None,
 			CurrencyRatio: 1,
 			Bet: 100,
 			ValidBet: 50,
@@ -78,7 +77,7 @@ public class GameBetCommandServiceUnitTest
 			.Received(1)
 			.AddAsync(
 			source: Arg.Is(new GameBetAddModel(
-					Id: command.Id,
+					Id: command.GameBetId,
 					GameProviderId: command.GameProviderId,
 					GameProviderConfigurationId: command.GameProviderConfigurationId,
 					GameId: command.GameId,
@@ -132,7 +131,7 @@ public class GameBetCommandServiceUnitTest
 		var externalPayoffOn = DateTimeOffset.UtcNow;
 
 		var command = new GameBetCommand(
-			Id: Guid.NewGuid(),
+			GameBetId: Guid.NewGuid(),
 			GameProviderId: Guid.NewGuid(),
 			GameProviderConfigurationId: Guid.NewGuid(),
 			GameId: 1,
@@ -148,13 +147,13 @@ public class GameBetCommandServiceUnitTest
 			ExternalClosedOn: externalClosedOn,
 			ExternalPayoffOn: externalPayoffOn,
 			ExternalResettleOn: DateTimeOffset.UnixEpoch,
-			BetState: BetState.Win,
-			BetType: BetType.Normal,
-			FreeGameState: FreeGameState.None,
-			GambleState: GambleState.None,
-			CashoutState: CashoutState.None,
-			ResettleState: ResettleState.None,
-			JackpotState: JackpotState.None,
+			BetState: Common.Protos.BetState.Win,
+			BetType: Common.Protos.BetType.Normal,
+			FreeGameState: Common.Protos.FreeGameState.None,
+			GambleState: Common.Protos.GambleState.None,
+			CashoutState: Common.Protos.CashoutState.None,
+			ResettleState: Common.Protos.ResettleState.None,
+			JackpotState: Common.Protos.JackpotState.None,
 			CurrencyRatio: 1,
 			Bet: 100,
 			ValidBet: 50,
@@ -186,13 +185,13 @@ public class GameBetCommandServiceUnitTest
 			ExternalClosedOn: externalClosedOn,
 			ExternalPayoffOn: externalPayoffOn,
 			ExternalResettleOn: DateTimeOffset.UnixEpoch,
-			BetState: BetState.Lose,
-			BetType: BetType.Normal,
-			FreeGameState: FreeGameState.None,
-			GambleState: GambleState.None,
-			CashoutState: CashoutState.None,
-			ResettleState: ResettleState.None,
-			JackpotState: JackpotState.None,
+			BetState: Common.Protos.BetState.Lose,
+			BetType: Common.Protos.BetType.Normal,
+			FreeGameState: Common.Protos.FreeGameState.None,
+			GambleState: Common.Protos.GambleState.None,
+			CashoutState: Common.Protos.CashoutState.None,
+			ResettleState: Common.Protos.ResettleState.None,
+			JackpotState: Common.Protos.JackpotState.None,
 			CurrencyRatio: 1,
 			Bet: 100,
 			ValidBet: 50,
@@ -269,7 +268,7 @@ public class GameBetCommandServiceUnitTest
 		var externalPayoffOn = DateTimeOffset.UtcNow;
 
 		var command = new GameBetCommand(
-			Id: Guid.NewGuid(),
+			GameBetId: Guid.NewGuid(),
 			GameProviderId: Guid.NewGuid(),
 			GameProviderConfigurationId: Guid.NewGuid(),
 			GameId: 1,
@@ -285,13 +284,13 @@ public class GameBetCommandServiceUnitTest
 			ExternalClosedOn: externalClosedOn,
 			ExternalPayoffOn: externalPayoffOn,
 			ExternalResettleOn: DateTimeOffset.UnixEpoch,
-			BetState: BetState.Win,
-			BetType: BetType.Normal,
-			FreeGameState: FreeGameState.None,
-			GambleState: GambleState.None,
-			CashoutState: CashoutState.None,
-			ResettleState: ResettleState.None,
-			JackpotState: JackpotState.None,
+			BetState: Common.Protos.BetState.Win,
+			BetType: Common.Protos.BetType.Normal,
+			FreeGameState: Common.Protos.FreeGameState.None,
+			GambleState: Common.Protos.GambleState.None,
+			CashoutState: Common.Protos.CashoutState.None,
+			ResettleState: Common.Protos.ResettleState.None,
+			JackpotState: Common.Protos.JackpotState.None,
 			CurrencyRatio: 1,
 			Bet: 100,
 			ValidBet: 50,
@@ -323,13 +322,13 @@ public class GameBetCommandServiceUnitTest
 			ExternalClosedOn: externalClosedOn,
 			ExternalPayoffOn: externalPayoffOn,
 			ExternalResettleOn: DateTimeOffset.UnixEpoch,
-			BetState: BetState.Win,
-			BetType: BetType.Normal,
-			FreeGameState: FreeGameState.None,
-			GambleState: GambleState.None,
-			CashoutState: CashoutState.None,
-			ResettleState: ResettleState.None,
-			JackpotState: JackpotState.None,
+			BetState: Common.Protos.BetState.Win,
+			BetType: Common.Protos.BetType.Normal,
+			FreeGameState: Common.Protos.FreeGameState.None,
+			GambleState: Common.Protos.GambleState.None,
+			CashoutState: Common.Protos.CashoutState.None,
+			ResettleState: Common.Protos.ResettleState.None,
+			JackpotState: Common.Protos.JackpotState.None,
 			CurrencyRatio: 1,
 			Bet: 100,
 			ValidBet: 50,

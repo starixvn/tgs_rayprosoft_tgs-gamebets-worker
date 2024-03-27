@@ -1,12 +1,13 @@
 ﻿using System.Text.Json.Nodes;
 using Google.Protobuf.WellKnownTypes;
 using NSubstitute;
-using Tgs.GameBets.First.Worker.Common.Protos;
+using NSubstitute.ExceptionExtensions;
+
 using Tgs.GameBets.First.Worker.Common;
+using Tgs.GameBets.First.Worker.Common.Protos;
 using Tgs.GameBets.Worker.Core.ApplicationServices;
 using Tgs.GameBets.Worker.Core.Models;
 using Valhalla.MessageQueue;
-using NSubstitute.ExceptionExtensions;
 
 namespace Tgs.GameBets.Worker.Core.UnitTest.ApplicationServices;
 
@@ -30,8 +31,7 @@ public class GameBetFirstCommandServiceUnitTest
 			PlayerCode: "test",
 			WalletId: Guid.NewGuid(),
 			ExternalBetId: externalBetId,
-			ExternalCreatedOn: externalCreatedOn,
-			BetState: Queue.Common.Enums.BetState.Win);
+			ExternalCreatedOn: externalCreatedOn);
 
 		var model = new GameBetInfoModel(
 			Id: Guid.NewGuid(),
@@ -50,13 +50,13 @@ public class GameBetFirstCommandServiceUnitTest
 			ExternalClosedOn: externalClosedOn,
 			ExternalPayoffOn: externalPayoffOn,
 			ExternalResettleOn: DateTimeOffset.UnixEpoch,
-			BetState: Queue.Common.Enums.BetState.Win,
-			BetType: Queue.Common.Enums.BetType.Normal,
-			FreeGameState: Queue.Common.Enums.FreeGameState.None,
-			GambleState: Queue.Common.Enums.GambleState.None,
-			CashoutState: Queue.Common.Enums.CashoutState.None,
-			ResettleState: Queue.Common.Enums.ResettleState.None,
-			JackpotState: Queue.Common.Enums.JackpotState.None,
+			BetState: Common.Protos.BetState.Win,
+			BetType: Common.Protos.BetType.Normal,
+			FreeGameState: Common.Protos.FreeGameState.None,
+			GambleState: Common.Protos.GambleState.None,
+			CashoutState: Common.Protos.CashoutState.None,
+			ResettleState: Common.Protos.ResettleState.None,
+			JackpotState: Common.Protos.JackpotState.None,
 			CurrencyRatio: 1,
 			Bet: 100,
 			ValidBet: 50,
@@ -152,8 +152,7 @@ public class GameBetFirstCommandServiceUnitTest
 			PlayerCode: "test",
 			WalletId: Guid.NewGuid(),
 			ExternalBetId: externalBetId,
-			ExternalCreatedOn: externalCreatedOn,
-			BetState: Queue.Common.Enums.BetState.Win);
+			ExternalCreatedOn: externalCreatedOn);
 		_ = fakeGameBetRepositoryRepository.GetAsync(
 			gameProviderId: Arg.Is(command.GameProviderId),
 			gameId: Arg.Is(command.GameId),
@@ -168,70 +167,6 @@ public class GameBetFirstCommandServiceUnitTest
 			fakeMessageSender);
 
 		_ = await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ExecuteAsync(command).AsTask());
-
-		_ = fakeMessageSender
-			.Received(0)
-			.PublishAsync(
-			subject: Arg.Is(GameBetsFirstWorkerNatsConst.GameBetsFirstWorkerRequest),
-			data: Arg.Any<GameBetsFirstWorkerRequest>(),
-			cancellationToken: Arg.Any<CancellationToken>());
-	}
-
-	[Fact]
-	public async Task BetState_Is_Waiting()
-	{
-		var fakeGameBetRepositoryRepository = Substitute.For<IGameBetRepository>();
-		var fakeMessageSender = Substitute.For<IMessageSender>();
-
-		var externalBetId = Guid.NewGuid().ToString();
-		var externalCreatedOn = DateTimeOffset.UtcNow.AddMinutes(-5);
-
-		var command = new GameBetFirstCommand(
-			GameProviderId: Guid.NewGuid(),
-			GameId: 1,
-			PlayerCode: "test",
-			WalletId: Guid.NewGuid(),
-			ExternalBetId: externalBetId,
-			ExternalCreatedOn: externalCreatedOn,
-			BetState: Queue.Common.Enums.BetState.Waiting);
-
-		var sut = new GameBetFirstCommandService(
-			fakeGameBetRepositoryRepository,
-			fakeMessageSender);
-
-		await sut.ExecuteAsync(command);
-
-		_ = fakeMessageSender
-			.Received(0)
-			.PublishAsync(
-			subject: Arg.Is(GameBetsFirstWorkerNatsConst.GameBetsFirstWorkerRequest),
-			data: Arg.Any<GameBetsFirstWorkerRequest>(),
-			cancellationToken: Arg.Any<CancellationToken>());
-	}
-
-	[Fact]
-	public async Task BetState_Is_Running()
-	{
-		var fakeGameBetRepositoryRepository = Substitute.For<IGameBetRepository>();
-		var fakeMessageSender = Substitute.For<IMessageSender>();
-
-		var externalBetId = Guid.NewGuid().ToString();
-		var externalCreatedOn = DateTimeOffset.UtcNow.AddMinutes(-5);
-
-		var command = new GameBetFirstCommand(
-			GameProviderId: Guid.NewGuid(),
-			GameId: 1,
-			PlayerCode: "test",
-			WalletId: Guid.NewGuid(),
-			ExternalBetId: externalBetId,
-			ExternalCreatedOn: externalCreatedOn,
-			BetState: Queue.Common.Enums.BetState.Waiting);
-
-		var sut = new GameBetFirstCommandService(
-			fakeGameBetRepositoryRepository,
-			fakeMessageSender);
-
-		await sut.ExecuteAsync(command);
 
 		_ = fakeMessageSender
 			.Received(0)

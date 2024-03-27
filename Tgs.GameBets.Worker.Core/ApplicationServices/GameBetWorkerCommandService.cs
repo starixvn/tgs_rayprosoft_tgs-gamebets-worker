@@ -1,76 +1,62 @@
-﻿using Tgs.GameBets.Queue.Client;
-using Tgs.ServiceUtility;
+﻿using Tgs.ServiceUtility;
 
 namespace Tgs.GameBets.Worker.Core.ApplicationServices;
 
 internal class GameBetWorkerCommandService(
-	IGameBetQueueClient client,
-	ICommandService<GameBetHandlerCommand> gameBetHandlerService) : ICommandService<GameBetWorkerCommand>
+	ICommandService<GameBetCommand> gameBetService,
+	ICommandService<GameBetFirstCommand> gameBetFirstService) : ICommandService<GameBetWorkerCommand>
 {
 	public async ValueTask ExecuteAsync(GameBetWorkerCommand command, CancellationToken cancellationToken = default)
 	{
-		var pageSize = 250;
-		IEnumerable<Queue.Common.ViewModels.GameBetQueueInfoViewModel> gameBetQueueInfos;
-
-		gameBetQueueInfos = await client.QueryAsync(
-			gameProviderCode: command.GameProviderCode,
-			pageIndex: command.PageIndex,
-			pageSize: pageSize,
-			cancellationToken: cancellationToken)
-			.ToArrayAsync(cancellationToken: cancellationToken)
-			.ConfigureAwait(false)
-			?? Enumerable.Empty<Queue.Common.ViewModels.GameBetQueueInfoViewModel>();
-
-		var tempDeletes = new List<Guid>();
-		foreach (var gameBetQueueInfo in gameBetQueueInfos)
+		if (command.BetState is Common.Protos.BetState.Waiting or Common.Protos.BetState.Running)
 		{
-			await gameBetHandlerService.ExecuteAsync(
-			command: new GameBetHandlerCommand(
-				GameProviderId: gameBetQueueInfo.GameProviderId,
-				GameProviderConfigurationId: gameBetQueueInfo.GameProviderConfigurationId,
-				GameId: gameBetQueueInfo.GameId,
-				ResellerId: gameBetQueueInfo.ResellerId,
-				LicenseeId: gameBetQueueInfo.LicenseeId,
-				BrandId: gameBetQueueInfo.BrandId,
-				PlayerCode: gameBetQueueInfo.PlayerCode,
-				CurrencyCode: gameBetQueueInfo.CurrencyCode,
-				WalletId: gameBetQueueInfo.WalletId,
-				ExternalRoundId: gameBetQueueInfo.ExternalRoundId,
-				ExternalBetId: gameBetQueueInfo.ExternalBetId,
-				ExternalCreatedOn: gameBetQueueInfo.ExternalCreatedOn,
-				ExternalClosedOn: gameBetQueueInfo.ExternalClosedOn,
-				ExternalPayoffOn: gameBetQueueInfo.ExternalPayoffOn,
-				ExternalResettleOn: gameBetQueueInfo.ExternalResettleOn,
-				BetState: gameBetQueueInfo.BetState,
-				BetType: gameBetQueueInfo.BetType,
-				FreeGameState: gameBetQueueInfo.FreeGameState,
-				GambleState: gameBetQueueInfo.GambleState,
-				CashoutState: gameBetQueueInfo.CashoutState,
-				ResettleState: gameBetQueueInfo.ResettleState,
-				JackpotState: gameBetQueueInfo.JackpotState,
-				CurrencyRatio: gameBetQueueInfo.CurrencyRatio,
-				Bet: gameBetQueueInfo.Bet,
-				ValidBet: gameBetQueueInfo.ValidBet,
-				Settle: gameBetQueueInfo.Settle,
-				Commission: gameBetQueueInfo.Commission,
-				Turnover: gameBetQueueInfo.Turnover,
-				WinLoss: gameBetQueueInfo.WinLoss,
-				Jackpot: gameBetQueueInfo.Jackpot,
-				AdditionalData: gameBetQueueInfo.AdditionalData),
-			cancellationToken: cancellationToken)
-			.ConfigureAwait(false);
-
-			tempDeletes.Add(gameBetQueueInfo.Id);
-
+			return;
 		}
 
-		foreach (var tempDelete in tempDeletes)
-		{
-			await client.DeleteAsync(
-				gameProviderCode: command.GameProviderCode,
-				id: tempDelete,
-				cancellationToken: cancellationToken)
-				.ConfigureAwait(false);
-		}
+		await gameBetService.ExecuteAsync(
+		command: new GameBetCommand(
+			GameBetId: command.GameBetId,
+			GameProviderId: command.GameProviderId,
+			GameProviderConfigurationId: command.GameProviderConfigurationId,
+			GameId: command.GameId,
+			ResellerId: command.ResellerId,
+			LicenseeId: command.LicenseeId,
+			BrandId: command.BrandId,
+			PlayerCode: command.PlayerCode,
+			CurrencyCode: command.CurrencyCode,
+			WalletId: command.WalletId,
+			ExternalRoundId: command.ExternalRoundId,
+			ExternalBetId: command.ExternalBetId,
+			ExternalCreatedOn: command.ExternalCreatedOn,
+			ExternalClosedOn: command.ExternalClosedOn,
+			ExternalPayoffOn: command.ExternalPayoffOn,
+			ExternalResettleOn: command.ExternalResettleOn,
+			BetState: command.BetState,
+			BetType: command.BetType,
+			FreeGameState: command.FreeGameState,
+			GambleState: command.GambleState,
+			CashoutState: command.CashoutState,
+			ResettleState: command.ResettleState,
+			JackpotState: command.JackpotState,
+			CurrencyRatio: command.CurrencyRatio,
+			Bet: command.Bet,
+			ValidBet: command.ValidBet,
+			Settle: command.Settle,
+			Commission: command.Commission,
+			Turnover: command.Turnover,
+			WinLoss: command.WinLoss,
+			Jackpot: command.Jackpot,
+			AdditionalData: command.AdditionalData),
+		cancellationToken).ConfigureAwait(false);
+
+		await gameBetFirstService.ExecuteAsync(
+		command: new GameBetFirstCommand(
+			GameProviderId: command.GameProviderId,
+			GameId: command.GameId,
+			PlayerCode: command.PlayerCode,
+			WalletId: command.WalletId,
+			ExternalBetId: command.ExternalBetId,
+			ExternalCreatedOn: command.ExternalCreatedOn),
+		cancellationToken).ConfigureAwait(false);
 	}
 }

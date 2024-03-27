@@ -1,4 +1,36 @@
-﻿namespace Tgs.GameBets.Worker.Core.ApplicationServices;
+﻿using System.Text.Json.Nodes;
+
+namespace Tgs.GameBets.Worker.Core.ApplicationServices;
 public record GameBetWorkerCommand(
-	string GameProviderCode,
-	int PageIndex);
+	Guid GameBetId,
+	Guid GameProviderId,
+	Guid GameProviderConfigurationId,
+	int GameId,
+	Guid ResellerId,
+	Guid LicenseeId,
+	Guid BrandId,
+	string PlayerCode,
+	string CurrencyCode,
+	Guid WalletId,
+	string ExternalRoundId,
+	string ExternalBetId,
+	DateTimeOffset ExternalCreatedOn,
+	DateTimeOffset ExternalClosedOn,
+	DateTimeOffset ExternalPayoffOn,
+	DateTimeOffset ExternalResettleOn,
+	Common.Protos.BetState BetState,
+	Common.Protos.BetType BetType,
+	Common.Protos.FreeGameState FreeGameState,
+	Common.Protos.GambleState GambleState,
+	Common.Protos.CashoutState CashoutState,
+	Common.Protos.ResettleState ResettleState,
+	Common.Protos.JackpotState JackpotState,
+	decimal CurrencyRatio,
+	decimal Bet,
+	decimal ValidBet,
+	decimal Settle,
+	decimal Commission,
+	decimal Turnover,
+	decimal WinLoss,
+	decimal Jackpot,
+	JsonNode AdditionalData);

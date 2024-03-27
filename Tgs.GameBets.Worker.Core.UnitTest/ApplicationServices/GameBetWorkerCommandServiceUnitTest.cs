@@ -1,8 +1,5 @@
 ﻿using System.Text.Json.Nodes;
 using NSubstitute;
-using Tgs.GameBets.Queue.Client;
-using Tgs.GameBets.Queue.Common.Enums;
-using Tgs.GameBets.Queue.Common.ViewModels;
 using Tgs.GameBets.Worker.Core.ApplicationServices;
 using Tgs.ServiceUtility;
 
@@ -11,59 +8,19 @@ namespace Tgs.GameBets.Worker.Core.UnitTest.ApplicationServices;
 public class GameBetWorkerCommandServiceUnitTest
 {
 	[Fact]
-	public async Task This_game_betting_event_source_has_no_data()
+	public async Task Normal_Process()
 	{
-		var fakeGameBetQueueClient = Substitute.For<IGameBetQueueClient>();
-		var fakeGameBetHandlerService = Substitute.For<ICommandService<GameBetHandlerCommand>>();
+		var fakeGameBetService = Substitute.For<ICommandService<GameBetCommand>>();
+		var fakeGameBetFirstService = Substitute.For<ICommandService<GameBetFirstCommand>>();
 
-		var command = new GameBetWorkerCommand(
-			GameProviderCode: "KY",
-			PageIndex: 1);
-
-		_ = fakeGameBetQueueClient.QueryAsync(
-			gameProviderCode: Arg.Is(command.GameProviderCode),
-			pageIndex: Arg.Is(command.PageIndex),
-			pageSize: Arg.Any<int>(),
-			cancellationToken: Arg.Any<CancellationToken>())
-			.Returns(Enumerable.Empty<GameBetQueueInfoViewModel>().ToAsyncEnumerable());
-
-		var sut = new GameBetWorkerCommandService(
-			fakeGameBetQueueClient,
-			fakeGameBetHandlerService);
-
-		await sut.ExecuteAsync(command);
-
-		_ = fakeGameBetHandlerService
-			.Received(0)
-			.ExecuteAsync(
-			command: Arg.Any<GameBetHandlerCommand>(),
-			cancellationToken: Arg.Any<CancellationToken>());
-
-		_ = fakeGameBetQueueClient
-			.Received(0)
-			.DeleteAsync(
-			gameProviderCode: Arg.Is(command.GameProviderCode),
-			id: Arg.Any<Guid>(),
-			cancellationToken: Arg.Any<CancellationToken>());
-	}
-
-	[Fact]
-	public async Task This_game_betting_event_has_data()
-	{
-		var fakeGameBetQueueClient = Substitute.For<IGameBetQueueClient>();
-		var fakeGameBetHandlerService = Substitute.For<ICommandService<GameBetHandlerCommand>>();
-
-		var command = new GameBetWorkerCommand(
-			GameProviderCode: "KY",
-			PageIndex: 1);
-
-		var externalRoundId = DateTimeOffset.UtcNow.AddSeconds(-5).ToUnixTimeMilliseconds().ToString();
-		var externalBetId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+		var externalRoundId = Guid.NewGuid().ToString();
+		var externalBetId = Guid.NewGuid().ToString();
 		var externalCreatedOn = DateTimeOffset.UtcNow.AddMinutes(-5);
 		var externalClosedOn = DateTimeOffset.UtcNow.AddSeconds(-5);
 		var externalPayoffOn = DateTimeOffset.UtcNow;
-		var gameBetQueueInfo = new GameBetQueueInfoViewModel(
-			Id: Guid.NewGuid(),
+
+		var command = new GameBetWorkerCommand(
+			GameBetId: Guid.NewGuid(),
 			GameProviderId: Guid.NewGuid(),
 			GameProviderConfigurationId: Guid.NewGuid(),
 			GameId: 1,
@@ -79,13 +36,13 @@ public class GameBetWorkerCommandServiceUnitTest
 			ExternalClosedOn: externalClosedOn,
 			ExternalPayoffOn: externalPayoffOn,
 			ExternalResettleOn: DateTimeOffset.UnixEpoch,
-			BetState: BetState.Win,
-			BetType: BetType.Normal,
-			FreeGameState: FreeGameState.None,
-			GambleState: GambleState.None,
-			CashoutState: CashoutState.None,
-			ResettleState: ResettleState.None,
-			JackpotState: JackpotState.None,
+			BetState: Common.Protos.BetState.Win,
+			BetType: Common.Protos.BetType.Normal,
+			FreeGameState: Common.Protos.FreeGameState.None,
+			GambleState: Common.Protos.GambleState.None,
+			CashoutState: Common.Protos.CashoutState.None,
+			ResettleState: Common.Protos.ResettleState.None,
+			JackpotState: Common.Protos.JackpotState.None,
 			CurrencyRatio: 1,
 			Bet: 100,
 			ValidBet: 50,
@@ -96,67 +53,62 @@ public class GameBetWorkerCommandServiceUnitTest
 			Jackpot: 0.0m,
 			AdditionalData: new JsonObject
 			{
-				["RoundId"] = externalRoundId,
-				["WagerId"] = externalBetId,
-				["BetOn"] = externalCreatedOn,
-				["SettleOn"] = externalClosedOn,
-				["PayoffOn"] = externalPayoffOn
-			},
-			CreatedOn: DateTimeOffset.UtcNow,
-			ExpireOn: DateTimeOffset.UtcNow.AddHours(1));
-		_ = fakeGameBetQueueClient.QueryAsync(
-			gameProviderCode: Arg.Is(command.GameProviderCode),
-			pageIndex: Arg.Is(command.PageIndex),
-			pageSize: Arg.Any<int>(),
-			cancellationToken: Arg.Any<CancellationToken>())
-			.Returns(new GameBetQueueInfoViewModel[] { gameBetQueueInfo }.ToAsyncEnumerable(), Enumerable.Empty<GameBetQueueInfoViewModel>().ToAsyncEnumerable());
+				["ExternalRoundId"] = externalRoundId,
+				["ExternalBetId"] = externalBetId
+			});
 
 		var sut = new GameBetWorkerCommandService(
-			fakeGameBetQueueClient,
-			fakeGameBetHandlerService);
+			fakeGameBetService,
+			fakeGameBetFirstService);
 
 		await sut.ExecuteAsync(command);
 
-		_ = fakeGameBetHandlerService
+		_ = fakeGameBetService
 			.Received(1)
 			.ExecuteAsync(
-			command: Arg.Is(new GameBetHandlerCommand(
-				GameProviderId: gameBetQueueInfo.GameProviderId,
-				GameProviderConfigurationId: gameBetQueueInfo.GameProviderConfigurationId,
-				GameId: gameBetQueueInfo.GameId,
-				ResellerId: gameBetQueueInfo.ResellerId,
-				LicenseeId: gameBetQueueInfo.LicenseeId,
-				BrandId: gameBetQueueInfo.BrandId,
-				PlayerCode: gameBetQueueInfo.PlayerCode,
-				CurrencyCode: gameBetQueueInfo.CurrencyCode,
-				WalletId: gameBetQueueInfo.WalletId,
-				ExternalRoundId: gameBetQueueInfo.ExternalRoundId,
-				ExternalBetId: gameBetQueueInfo.ExternalBetId,
-				ExternalCreatedOn: gameBetQueueInfo.ExternalCreatedOn,
-				ExternalClosedOn: gameBetQueueInfo.ExternalClosedOn,
-				ExternalPayoffOn: gameBetQueueInfo.ExternalPayoffOn,
-				ExternalResettleOn: gameBetQueueInfo.ExternalResettleOn,
-				BetState: gameBetQueueInfo.BetState,
-				BetType: gameBetQueueInfo.BetType,
-				FreeGameState: gameBetQueueInfo.FreeGameState,
-				GambleState: gameBetQueueInfo.GambleState,
-				CashoutState: gameBetQueueInfo.CashoutState,
-				ResettleState: gameBetQueueInfo.ResettleState,
-				JackpotState: gameBetQueueInfo.JackpotState,
-				CurrencyRatio: gameBetQueueInfo.CurrencyRatio,
-				Bet: gameBetQueueInfo.Bet,
-				ValidBet: gameBetQueueInfo.ValidBet,
-				Settle: gameBetQueueInfo.Settle,
-				Commission: gameBetQueueInfo.Commission,
-				Turnover: gameBetQueueInfo.Turnover,
-				WinLoss: gameBetQueueInfo.WinLoss,
-				Jackpot: gameBetQueueInfo.Jackpot,
-				AdditionalData: gameBetQueueInfo.AdditionalData)),
+			command: Arg.Is(new GameBetCommand(
+				GameBetId: command.GameBetId,
+				GameProviderId: command.GameProviderId,
+				GameProviderConfigurationId: command.GameProviderConfigurationId,
+				GameId: command.GameId,
+				ResellerId: command.ResellerId,
+				LicenseeId: command.LicenseeId,
+				BrandId: command.BrandId,
+				PlayerCode: command.PlayerCode,
+				CurrencyCode: command.CurrencyCode,
+				WalletId: command.WalletId,
+				ExternalRoundId: command.ExternalRoundId,
+				ExternalBetId: command.ExternalBetId,
+				ExternalCreatedOn: command.ExternalCreatedOn,
+				ExternalClosedOn: command.ExternalClosedOn,
+				ExternalPayoffOn: command.ExternalPayoffOn,
+				ExternalResettleOn: command.ExternalResettleOn,
+				BetState: command.BetState,
+				BetType: command.BetType,
+				FreeGameState: command.FreeGameState,
+				GambleState: command.GambleState,
+				CashoutState: command.CashoutState,
+				ResettleState: command.ResettleState,
+				JackpotState: command.JackpotState,
+				CurrencyRatio: command.CurrencyRatio,
+				Bet: command.Bet,
+				ValidBet: command.ValidBet,
+				Settle: command.Settle,
+				Commission: command.Commission,
+				Turnover: command.Turnover,
+				WinLoss: command.WinLoss,
+				Jackpot: command.Jackpot,
+				AdditionalData: command.AdditionalData)),
 			cancellationToken: Arg.Any<CancellationToken>());
 
-		_ = fakeGameBetQueueClient.DeleteAsync(
-			gameProviderCode: Arg.Is(command.GameProviderCode),
-			id: Arg.Is(gameBetQueueInfo.Id),
+		_ = fakeGameBetFirstService.ExecuteAsync(
+			command: Arg.Is(new GameBetFirstCommand(
+			GameProviderId: command.GameProviderId,
+			GameId: command.GameId,
+			PlayerCode: command.PlayerCode,
+			WalletId: command.WalletId,
+			ExternalBetId: command.ExternalBetId,
+			ExternalCreatedOn: command.ExternalCreatedOn)),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 }
