@@ -94,9 +94,3 @@ affinity:
           values:
           - game-gamebets-worker
       topologyKey: kubernetes.io/hostname
-
-restart:
-  enabled: false
-  serviceAccount: game-gamebets-worker-restarter
-  annotations: {}
-  schedule: 0 0 * * * 

@@ -139,11 +139,7 @@ deploy-dev:
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
         "resources": $resources,
-        "replicaCount": 1,
-        "restart": {
-            "enabled": true,
-            "schedule": "10 0 * * 1-4/3"
-        }
+        "replicaCount": 1
       }
       EOF
     - |
@@ -156,11 +152,7 @@ deploy-dev:
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
         "resources": $resources,
-        "replicaCount": 1,
-        "restart": {
-            "enabled": true,
-            "schedule": "10 0 * * 1-4/3"
-        }
+        "replicaCount": 1
       }
       EOF
 
@@ -193,11 +185,7 @@ deploy-staging:
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
         "resources": $resources,
-        "replicaCount": 1,
-        "restart": {
-            "enabled": true,
-            "schedule": "10 0 * * 1-4/3"
-        }
+        "replicaCount": 1
       }
       EOF
     - |
@@ -210,11 +198,7 @@ deploy-staging:
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
         "resources": $resources,
-        "replicaCount": 1,
-        "restart": {
-            "enabled": true,
-            "schedule": "10 0 * * 1-4/3"
-        }
+        "replicaCount": 1
       }
       EOF
 
@@ -247,11 +231,7 @@ deploy-prod:
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
         "resources": $resources,
-        "replicaCount": 1,
-        "restart": {
-            "enabled": true,
-            "schedule": "10 0 * * 1-4/3"
-        }
+        "replicaCount": 2
       }
       EOF
     - |
@@ -264,10 +244,6 @@ deploy-prod:
         "nodeSelector": $node_selector,
         "tolerations": [$dedicated],
         "resources": $resources,
-        "replicaCount": 1,
-        "restart": {
-            "enabled": true,
-            "schedule": "10 0 * * 1-4/3"
-        }
+        "replicaCount": 2
       }
       EOF
