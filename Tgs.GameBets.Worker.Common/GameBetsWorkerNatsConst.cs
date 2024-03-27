@@ -2,5 +2,5 @@
 
 public class GameBetsWorkerNatsConst
 {
-	public const string GameBetsWorkerRequest = "game.gamebet.first.worker.request";
+	public const string GameBetsWorkerRequest = "game.gamebet.worker.request";
 }
