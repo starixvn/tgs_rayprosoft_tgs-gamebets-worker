@@ -10,9 +10,6 @@ data:
         "LogLevel": {
           "Default": "Warning"
         }
-      },
-      "GameBetsWorkerConnectionStrings": {
-        "GameBetQueueClientBaseUrl": "http://game-gamebets-queue"
       }
     }
   otel-collector-config.yaml: |

@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>9ef857e2-3100-43ae-a68c-640fded0408b</UserSecretsId>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UserSecretsId>9ef857e2-3100-43ae-a68c-640fded0408b</UserSecretsId>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="FluentdForward.OpenTelemetry.MessagePack" Version="0.3.7" />
@@ -26,9 +26,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Tgs.GameBets.Worker.Common\Tgs.GameBets.Worker.Common.csproj" />
-	  <ProjectReference Include="..\Tgs.GameBets.Worker.Core\Tgs.GameBets.Worker.Core.csproj" />
-	  <ProjectReference Include="..\Tgs.GameBets.Worker.Repositories\Tgs.GameBets.Worker.Repositories.csproj" />
+		<ProjectReference Include="..\Tgs.GameBets.Worker.Common\Tgs.GameBets.Worker.Common.csproj" />
+		<ProjectReference Include="..\Tgs.GameBets.Worker.Core\Tgs.GameBets.Worker.Core.csproj" />
+		<ProjectReference Include="..\Tgs.GameBets.Worker.Repositories\Tgs.GameBets.Worker.Repositories.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -1,7 +1,5 @@
 ﻿using System.Net.Mime;
 using System.Text.Json.Serialization;
-using Hangfire;
-using Hangfire.Redis.StackExchange;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NATS.Client.Core;
@@ -49,23 +47,6 @@ builder.Services.AddSwaggerGen(c =>
 	foreach (var xmlFileName in Directory.EnumerateFiles(AppContext.BaseDirectory, "*.xml"))
 		c.IncludeXmlComments(xmlFileName);
 });
-
-// Learn more about configuring Hangfire
-builder
-	.Services
-	.AddHangfire((sp, config) =>
-	{
-		var systemConfig = sp.GetRequiredService<IConfiguration>();
-		var connectionString = builder.Configuration.GetConnectionString("Redis")!;
-		var options = new RedisStorageOptions
-		{
-			Prefix = "gamebets-worker-schedule:hangfire:"
-		};
-		_ = config
-		.UseRedisStorage(connectionString, options)
-		.WithJobExpirationTimeout(TimeSpan.FromMinutes(30));
-	})
-	.AddHangfireServer();
 
 builder.Services.AddGameBetsWorker(
 	(sp, dbBuilder) =>
