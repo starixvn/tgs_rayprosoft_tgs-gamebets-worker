@@ -1,14 +1,14 @@
 ﻿using System.Text.Json.Nodes;
 using Tgs.GameBets.Worker.Common.Protos;
+using Tgs.GameBets.Worker.Core;
 using Tgs.GameBets.Worker.Core.ApplicationServices;
-using Tgs.ServiceUtility;
 using Valhalla.MessageQueue;
 
 namespace Tgs.GameBets.First.Worker.Messages;
 
 internal class GameBetsWorkerMessageHandler(
 	ILogger<GameBetsWorkerMessageHandler> logger,
-	ICommandService<GameBetWorkerCommand> service) : IMessageHandler<GameBetsWorkerRequest>
+	IGameBetsWorkerDispatcher dispatcher) : IMessageHandler<GameBetsWorkerRequest>
 {
 	public ValueTask HandleAsync(string subject, GameBetsWorkerRequest data, IEnumerable<MessageHeaderValue>? headerValues, CancellationToken cancellationToken = default)
 	{
@@ -26,7 +26,7 @@ internal class GameBetsWorkerMessageHandler(
 				ExternalCreatedOn = data.ExternalCreatedOn.ToDateTimeOffset()
 			});
 
-		return service.ExecuteAsync(
+		return dispatcher.PushCommandAsync(
 			command: new GameBetWorkerCommand(
 				data.GameBetId.ToGuid(),
 				data.GameProviderId.ToGuid(),

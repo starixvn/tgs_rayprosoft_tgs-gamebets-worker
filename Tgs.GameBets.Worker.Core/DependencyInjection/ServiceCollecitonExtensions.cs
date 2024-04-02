@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Tgs.GameBets.Worker.Core;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -9,5 +10,6 @@ public static class ServiceCollecitonExtensions
 		=> services
 		.RegisterAllServiceUtilityTypes(
 			Assembly.GetExecutingAssembly(),
-			ServiceLifetime.Transient);
+			ServiceLifetime.Transient)
+		.AddSingleton<IGameBetsWorkerDispatcher, GameBetsWorkerDispatcher>();
 }

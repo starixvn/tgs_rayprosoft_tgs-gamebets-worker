@@ -10,6 +10,8 @@ internal class GameBetRepository(
 {
 	public async ValueTask AddAsync(GameBetAddModel source, CancellationToken cancellationToken = default)
 	{
+		context.ChangeTracker.Clear();
+
 		var entity = new GameBet
 		{
 			Id = source.Id,
@@ -62,17 +64,24 @@ internal class GameBetRepository(
 	}
 
 	public async ValueTask<bool> ExistAsync(Guid gameProviderId, int gameId, Guid walletId, string externalBetId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
-		=> await context.GameBets
-		.AnyAsync(gbs => gbs.ExternalCreatedOn >= externalCreatedOn.UtcDateTime.AddDays(-7) &&
+	{
+		context.ChangeTracker.Clear();
+
+		return await context.GameBets
+			.AnyAsync(gbs => gbs.ExternalCreatedOn >= externalCreatedOn.UtcDateTime.AddDays(-7) &&
 			gbs.GameProviderId == gameProviderId &&
 			gbs.GameId == gameId &&
 			gbs.WalletId == walletId &&
 			gbs.ExternalBetId == externalBetId,
 			cancellationToken: cancellationToken)
-		.ConfigureAwait(false);
+			.ConfigureAwait(false);
+	}
 
 	public async ValueTask<GameBetInfoModel?> GetAsync(Guid gameProviderId, int gameId, Guid walletId, string externalBetId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
-		=> await context.GameBets
+	{
+		context.ChangeTracker.Clear();
+
+		return await context.GameBets
 		.Where(gbs => gbs.ExternalCreatedOn >= externalCreatedOn.UtcDateTime.AddDays(-7) &&
 			gbs.GameProviderId == gameProviderId &&
 			gbs.GameId == gameId &&
@@ -117,9 +126,12 @@ internal class GameBetRepository(
 		.FirstOrDefaultAsync(
 			cancellationToken: cancellationToken)
 		.ConfigureAwait(false);
+	}
 
 	public async ValueTask UpdateAsync(GameBetUpdateModel source, CancellationToken cancellationToken = default)
 	{
+		context.ChangeTracker.Clear();
+
 		var entity = await context.GameBets
 			.Where(gws => gws.ExternalCreatedOn >= source.ExternalCreatedOn.AddDays(-7) &&
 			gws.Id == source.Id)
