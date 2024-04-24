@@ -152,7 +152,6 @@ internal class GameBetsWorkerChannel(
 							command.ExternalBetId,
 							command.ExternalCreatedOn
 						});
-
 				}
 			}
 		}

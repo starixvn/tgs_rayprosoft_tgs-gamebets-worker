@@ -2,8 +2,6 @@
 using Google.Protobuf.WellKnownTypes;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
-using Tgs.GameBets.First.Worker.Common;
-using Tgs.GameBets.First.Worker.Common.Protos;
 using Tgs.GameBets.Worker.Core.ApplicationServices;
 using Tgs.GameBets.Worker.Core.Models;
 using Valhalla.MessageQueue;
@@ -49,13 +47,13 @@ public class GameBetFirstCommandServiceUnitTest
 			ExternalClosedOn: externalClosedOn,
 			ExternalPayoffOn: externalPayoffOn,
 			ExternalResettleOn: DateTimeOffset.UnixEpoch,
-			BetState: Common.Protos.BetState.Win,
-			BetType: Common.Protos.BetType.Normal,
-			FreeGameState: Common.Protos.FreeGameState.None,
-			GambleState: Common.Protos.GambleState.None,
-			CashoutState: Common.Protos.CashoutState.None,
-			ResettleState: Common.Protos.ResettleState.None,
-			JackpotState: Common.Protos.JackpotState.None,
+			BetState: GameBets.Common.Enums.BetState.Win,
+			BetType: GameBets.Common.Enums.BetType.Normal,
+			FreeGameState: GameBets.Common.Enums.FreeGameState.None,
+			GambleState: GameBets.Common.Enums.GambleState.None,
+			CashoutState: GameBets.Common.Enums.CashoutState.None,
+			ResettleState: GameBets.Common.Enums.ResettleState.None,
+			JackpotState: GameBets.Common.Enums.JackpotState.None,
 			CurrencyRatio: 1,
 			Bet: 100,
 			ValidBet: 50,
@@ -91,8 +89,8 @@ public class GameBetFirstCommandServiceUnitTest
 		_ = fakeMessageSender
 			.Received(1)
 			.PublishAsync(
-			subject: Arg.Is(GameBetsFirstWorkerNatsConst.GameBetsFirstWorkerRequest),
-			data: Arg.Is(new GameBetsFirstWorkerRequest
+			subject: Arg.Is(First.Worker.Common.GameBetsFirstWorkerNatsConst.GameBetsFirstWorkerRequest),
+			data: Arg.Is(new First.Worker.Common.Protos.GameBetsFirstWorkerRequest
 			{
 				GameBetId = model.Id,
 				GameProviderId = model.GameProviderId,
@@ -110,13 +108,13 @@ public class GameBetFirstCommandServiceUnitTest
 				ExternalClosedOn = model.ExternalClosedOn.ToTimestamp(),
 				ExternalPayoffOn = model.ExternalPayoffOn.ToTimestamp(),
 				ExternalResettleOn = model.ExternalResettleOn.ToTimestamp(),
-				BetState = (BetState)model.BetState,
-				BetType = (BetType)model.BetType,
-				FreeGameState = (FreeGameState)model.FreeGameState,
-				GambleState = (GambleState)model.GambleState,
-				CashoutState = (CashoutState)model.CashoutState,
-				ResettleState = (ResettleState)model.ResettleState,
-				JackpotState = (JackpotState)model.JackpotState,
+				BetState = (First.Worker.Common.Protos.BetState)model.BetState,
+				BetType = (First.Worker.Common.Protos.BetType)model.BetType,
+				FreeGameState = (First.Worker.Common.Protos.FreeGameState)model.FreeGameState,
+				GambleState = (First.Worker.Common.Protos.GambleState)model.GambleState,
+				CashoutState = (First.Worker.Common.Protos.CashoutState)model.CashoutState,
+				ResettleState = (First.Worker.Common.Protos.ResettleState)model.ResettleState,
+				JackpotState = (First.Worker.Common.Protos.JackpotState)model.JackpotState,
 				CurrencyRatio = model.CurrencyRatio,
 				Bet = model.Bet,
 				ValidBet = model.ValidBet,
@@ -170,8 +168,8 @@ public class GameBetFirstCommandServiceUnitTest
 		_ = fakeMessageSender
 			.Received(0)
 			.PublishAsync(
-			subject: Arg.Is(GameBetsFirstWorkerNatsConst.GameBetsFirstWorkerRequest),
-			data: Arg.Any<GameBetsFirstWorkerRequest>(),
+			subject: Arg.Is(First.Worker.Common.GameBetsFirstWorkerNatsConst.GameBetsFirstWorkerRequest),
+			data: Arg.Any<First.Worker.Common.Protos.GameBetsFirstWorkerRequest>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 }

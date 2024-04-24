@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Nodes;
 
-namespace Tgs.GameBets.Worker.Core.ApplicationServices;
-public record GameBetCommand(
+namespace Tgs.GameBets.Worker.Core.Models;
+public record GameBetCommandModel(
 	Guid GameBetId,
 	Guid GameProviderId,
 	Guid GameProviderConfigurationId,
@@ -18,13 +18,13 @@ public record GameBetCommand(
 	DateTimeOffset ExternalClosedOn,
 	DateTimeOffset ExternalPayoffOn,
 	DateTimeOffset ExternalResettleOn,
-	Common.Protos.BetState BetState,
-	Common.Protos.BetType BetType,
-	Common.Protos.FreeGameState FreeGameState,
-	Common.Protos.GambleState GambleState,
-	Common.Protos.CashoutState CashoutState,
-	Common.Protos.ResettleState ResettleState,
-	Common.Protos.JackpotState JackpotState,
+	GameBets.Common.Enums.BetState BetState,
+	GameBets.Common.Enums.BetType BetType,
+	GameBets.Common.Enums.FreeGameState FreeGameState,
+	GameBets.Common.Enums.GambleState GambleState,
+	GameBets.Common.Enums.CashoutState CashoutState,
+	GameBets.Common.Enums.ResettleState ResettleState,
+	GameBets.Common.Enums.JackpotState JackpotState,
 	decimal CurrencyRatio,
 	decimal Bet,
 	decimal ValidBet,

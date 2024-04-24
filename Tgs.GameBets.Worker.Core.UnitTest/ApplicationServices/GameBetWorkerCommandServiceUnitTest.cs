@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Nodes;
 using NSubstitute;
 using Tgs.GameBets.Worker.Core.ApplicationServices;
+using Tgs.GameBets.Worker.Core.Models;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameBets.Worker.Core.UnitTest.ApplicationServices;
@@ -10,7 +11,7 @@ public class GameBetWorkerCommandServiceUnitTest
 	[Fact]
 	public async Task Normal_Process()
 	{
-		var fakeGameBetService = Substitute.For<ICommandService<GameBetCommand>>();
+		var fakeRepository = Substitute.For<IGameBetRepository>();
 		var fakeGameBetFirstService = Substitute.For<ICommandService<GameBetFirstCommand>>();
 
 		var externalRoundId = Guid.NewGuid().ToString();
@@ -36,13 +37,13 @@ public class GameBetWorkerCommandServiceUnitTest
 			ExternalClosedOn: externalClosedOn,
 			ExternalPayoffOn: externalPayoffOn,
 			ExternalResettleOn: DateTimeOffset.UnixEpoch,
-			BetState: Common.Protos.BetState.Win,
-			BetType: Common.Protos.BetType.Normal,
-			FreeGameState: Common.Protos.FreeGameState.None,
-			GambleState: Common.Protos.GambleState.None,
-			CashoutState: Common.Protos.CashoutState.None,
-			ResettleState: Common.Protos.ResettleState.None,
-			JackpotState: Common.Protos.JackpotState.None,
+			BetState: GameBets.Common.Enums.BetState.Win,
+			BetType: GameBets.Common.Enums.BetType.Normal,
+			FreeGameState: GameBets.Common.Enums.FreeGameState.None,
+			GambleState: GameBets.Common.Enums.GambleState.None,
+			CashoutState: GameBets.Common.Enums.CashoutState.None,
+			ResettleState: GameBets.Common.Enums.ResettleState.None,
+			JackpotState: GameBets.Common.Enums.JackpotState.None,
 			CurrencyRatio: 1,
 			Bet: 100,
 			ValidBet: 50,
@@ -58,15 +59,15 @@ public class GameBetWorkerCommandServiceUnitTest
 			});
 
 		var sut = new GameBetWorkerCommandService(
-			fakeGameBetService,
+			fakeRepository,
 			fakeGameBetFirstService);
 
 		await sut.ExecuteAsync(command);
 
-		_ = fakeGameBetService
+		_ = fakeRepository
 			.Received(1)
-			.ExecuteAsync(
-			command: Arg.Is(new GameBetCommand(
+			.CommandAsync(
+			source: Arg.Is(new GameBetCommandModel(
 				GameBetId: command.GameBetId,
 				GameProviderId: command.GameProviderId,
 				GameProviderConfigurationId: command.GameProviderConfigurationId,
@@ -103,12 +104,12 @@ public class GameBetWorkerCommandServiceUnitTest
 
 		_ = fakeGameBetFirstService.ExecuteAsync(
 			command: Arg.Is(new GameBetFirstCommand(
-			GameProviderId: command.GameProviderId,
-			GameId: command.GameId,
-			PlayerCode: command.PlayerCode,
-			WalletId: command.WalletId,
-			ExternalBetId: command.ExternalBetId,
-			ExternalCreatedOn: command.ExternalCreatedOn)),
+				GameProviderId: command.GameProviderId,
+				GameId: command.GameId,
+				PlayerCode: command.PlayerCode,
+				WalletId: command.WalletId,
+				ExternalBetId: command.ExternalBetId,
+				ExternalCreatedOn: command.ExternalCreatedOn)),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 }

@@ -10,6 +10,7 @@ using Tgs.GameBets.First.Worker.Common;
 
 using Tgs.GameBets.First.Worker.Messages;
 using Tgs.GameBets.Worker.Common;
+using Tgs.GameBets.Worker.Core;
 using Tgs.MessageQueue.Nats.Serializers;
 
 var filterInstrumentations = new[] { "html", "ico", "png", "jpg" };
@@ -48,17 +49,15 @@ builder.Services.AddSwaggerGen(c =>
 		c.IncludeXmlComments(xmlFileName);
 });
 
-builder.Services.AddGameBetsWorker(
-	(sp, dbBuilder) =>
+builder.Services.AddGameBetsWorker()
+	.AddOptions<PolicySettingsOptions>()
+	.Configure((options) => builder.Configuration.GetSection("PolicySettings").Bind(options))
+	.Services
+	.AddGameBetsClient(httpClientBuilder => httpClientBuilder.ConfigureHttpClient((sp, http) =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
-		_ = dbBuilder.UseNpgsql(config.GetConnectionString("Tgs"));
-	},
-	(options, sp) =>
-	{
-		var configuration = sp.GetRequiredService<IConfiguration>();
-		options.ConnectionString = configuration.GetConnectionString("Redis")!;
-	});
+		http.BaseAddress = config.GetValue<Uri>("GameBetsWorkerStrings:GameBetsClientBaseUrl");
+	}));
 
 builder.Services
 	.AddKeyedSingleton("Nats", (sp, _) => new NatsConnection(NatsOpts.Default with

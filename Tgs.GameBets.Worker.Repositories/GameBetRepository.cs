@@ -1,166 +1,136 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Polly;
+using Tgs.GameBets.Client;
+using Tgs.GameBets.Common.ViewModels;
 using Tgs.GameBets.Worker.Core;
 using Tgs.GameBets.Worker.Core.Models;
-using Tgs.GameBets.Worker.Entities;
 
 namespace Tgs.GameBets.Worker.Repositories;
 
 internal class GameBetRepository(
-	TgsContext context) : IGameBetRepository
+	ILogger<GameBetRepository> logger,
+	IOptions<PolicySettingsOptions> options,
+	IGameBetsClient client) : IGameBetRepository
 {
-	public async ValueTask AddAsync(GameBetAddModel source, CancellationToken cancellationToken = default)
+	private readonly PolicySettingsOptions _policySettingsOptions = options.Value;
+
+	public async ValueTask CommandAsync(GameBetCommandModel source, CancellationToken cancellationToken = default)
 	{
-		context.ChangeTracker.Clear();
+		var gameBetCommand = new GameBetCommandViewModel(
+			Id: source.GameBetId,
+			GameProviderId: source.GameProviderId,
+			GameProviderConfigurationId: source.GameProviderConfigurationId,
+			GameId: source.GameId,
+			ResellerId: source.ResellerId,
+			LicenseeId: source.LicenseeId,
+			BrandId: source.BrandId,
+			PlayerCode: source.PlayerCode,
+			CurrencyCode: source.CurrencyCode,
+			WalletId: source.WalletId,
+			ExternalRoundId: source.ExternalRoundId,
+			ExternalBetId: source.ExternalBetId,
+			ExternalCreatedOn: source.ExternalCreatedOn,
+			ExternalClosedOn: source.ExternalClosedOn,
+			ExternalPayoffOn: source.ExternalPayoffOn,
+			ExternalResettleOn: source.ExternalResettleOn,
+			BetState: source.BetState,
+			BetType: source.BetType,
+			FreeGameState: source.FreeGameState,
+			GambleState: source.GambleState,
+			CashoutState: source.CashoutState,
+			ResettleState: source.ResettleState,
+			JackpotState: source.JackpotState,
+			CurrencyRatio: source.CurrencyRatio,
+			Bet: source.Bet,
+			ValidBet: source.ValidBet,
+			Settle: source.Settle,
+			Commission: source.Commission,
+			Turnover: source.Turnover,
+			WinLoss: source.WinLoss,
+			Jackpot: source.Jackpot,
+			AdditionalData: source.AdditionalData);
 
-		var entity = new GameBet
-		{
-			Id = source.Id,
-			GameProviderId = source.GameProviderId,
-			GameProviderConfigurationId = source.GameProviderConfigurationId,
-			GameId = source.GameId,
-			ResellerId = source.ResellerId,
-			LicenseeId = source.LicenseeId,
-			BrandId = source.BrandId,
-			PlayerCode = source.PlayerCode,
-			CurrencyCode = source.CurrencyCode,
-			WalletId = source.WalletId,
-			ExternalRoundId = source.ExternalRoundId,
-			ExternalBetId = source.ExternalBetId,
-			ExternalCreatedOn = source.ExternalCreatedOn.UtcDateTime,
-			ExternalClosedOn = source.ExternalClosedOn.UtcDateTime,
-			ExternalPayoffOn = source.ExternalPayoffOn.UtcDateTime,
-			ExternalResettleOn = source.ExternalResettleOn.UtcDateTime,
-			BetState = (int)source.BetState,
-			BetType = (int)source.BetType,
-			FreeGameState = (int)source.FreeGameState,
-			GambleState = (int)source.GambleState,
-			CashoutState = (int)source.CashoutState,
-			ResettleState = (int)source.ResettleState,
-			JackpotState = (int)source.JackpotState,
-			CurrencyRatio = source.CurrencyRatio,
-			Bet = source.Bet,
-			ValidBet = source.ValidBet,
-			Settle = source.Settle,
-			Commission = source.Commission,
-			Turnover = source.Turnover,
-			WinLoss = source.WinLoss,
-			Jackpot = source.Jackpot,
-			CreatedOn = DateTime.UtcNow,
-			ClosedOn = DateTime.UtcNow,
-			UpdatedOn = DateTime.UtcNow,
-			ResetState = (int)Common.Protos.ResetState.None,
-			ResetOn = DateTimeOffset.UnixEpoch.UtcDateTime,
-			AdditionalData = source.AdditionalData.ToJsonString()
-		};
+		var retryCount = _policySettingsOptions.RetryCount;
+		var retrySeconds = _policySettingsOptions.RetrySeconds;
+		var retryPolicy = Policy
+			.Handle<HttpRequestException>()
+			.WaitAndRetryAsync(
+				retryCount: retryCount,
+				retryAttempt => TimeSpan.FromSeconds(Math.Pow(retrySeconds, retryAttempt)),
+				onRetry: (exception, retryTime, retryCount, context) => logger.LogWarning("LogOn:{logOn} Exception:{exception} RetryTime:{retryTime} RetryCount:{retryCount}",
+					DateTime.Now.ToString("o"),
+					exception.Message,
+					retryTime,
+					retryCount));
 
-		_ = await context.GameBets.AddAsync(
-			entity: entity,
-			cancellationToken: cancellationToken)
-			.ConfigureAwait(false);
-
-		_ = await context.SaveChangesAsync(
-			cancellationToken: cancellationToken)
-			.ConfigureAwait(false);
-	}
-
-	public async ValueTask<bool> ExistAsync(Guid gameProviderId, int gameId, Guid walletId, string externalBetId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
-	{
-		context.ChangeTracker.Clear();
-
-		return await context.GameBets
-			.AnyAsync(gbs => gbs.ExternalCreatedOn >= externalCreatedOn.UtcDateTime.AddDays(-7) &&
-			gbs.GameProviderId == gameProviderId &&
-			gbs.GameId == gameId &&
-			gbs.WalletId == walletId &&
-			gbs.ExternalBetId == externalBetId,
-			cancellationToken: cancellationToken)
+		await retryPolicy.ExecuteAsync(() => client.GameBetCommandAsync(
+			source: gameBetCommand,
+			cancellationToken: cancellationToken).AsTask())
 			.ConfigureAwait(false);
 	}
 
 	public async ValueTask<GameBetInfoModel?> GetAsync(Guid gameProviderId, int gameId, Guid walletId, string externalBetId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
 	{
-		context.ChangeTracker.Clear();
+		var retryCount = _policySettingsOptions.RetryCount;
+		var retrySeconds = _policySettingsOptions.RetrySeconds;
+		var retryPolicy = Policy
+			.Handle<HttpRequestException>()
+			.WaitAndRetryAsync(
+				retryCount: retryCount,
+				retryAttempt => TimeSpan.FromSeconds(Math.Pow(retrySeconds, retryAttempt)),
+				onRetry: (exception, retryTime, retryCount, context) => logger.LogWarning("LogOn:{logOn} Exception:{exception} RetryTime:{retryTime} RetryCount:{retryCount}",
+					DateTime.Now.ToString("o"),
+					exception.Message,
+					retryTime,
+					retryCount));
 
-		return await context.GameBets
-		.Where(gbs => gbs.ExternalCreatedOn >= externalCreatedOn.UtcDateTime.AddDays(-7) &&
-			gbs.GameProviderId == gameProviderId &&
-			gbs.GameId == gameId &&
-			gbs.WalletId == walletId &&
-			gbs.ExternalBetId == externalBetId)
-		.Select(gws => new GameBetInfoModel(
-			gws.Id,
-			gws.GameProviderId,
-			gws.GameProviderConfigurationId,
-			gws.GameId,
-			gws.ResellerId,
-			gws.LicenseeId,
-			gws.BrandId,
-			gws.PlayerCode,
-			gws.CurrencyCode,
-			gws.WalletId,
-			gws.ExternalRoundId,
-			gws.ExternalBetId,
-			gws.ExternalCreatedOn,
-			gws.ExternalClosedOn,
-			gws.ExternalPayoffOn,
-			gws.ExternalResettleOn,
-			(Common.Protos.BetState)gws.BetState,
-			(Common.Protos.BetType)gws.BetType,
-			(Common.Protos.FreeGameState)gws.FreeGameState,
-			(Common.Protos.GambleState)gws.GambleState,
-			(Common.Protos.CashoutState)gws.CashoutState,
-			(Common.Protos.ResettleState)gws.ResettleState,
-			(Common.Protos.JackpotState)gws.JackpotState,
-			gws.CurrencyRatio,
-			gws.Bet,
-			gws.ValidBet,
-			gws.Settle,
-			gws.Commission,
-			gws.Turnover,
-			gws.WinLoss,
-			gws.Jackpot,
-			gws.CreatedOn,
-			gws.ClosedOn,
-			gws.UpdatedOn,
-			gws.AdditionalData))
-		.FirstOrDefaultAsync(
-			cancellationToken: cancellationToken)
-		.ConfigureAwait(false);
-	}
-
-	public async ValueTask UpdateAsync(GameBetUpdateModel source, CancellationToken cancellationToken = default)
-	{
-		context.ChangeTracker.Clear();
-
-		var entity = await context.GameBets
-			.Where(gws => gws.ExternalCreatedOn >= source.ExternalCreatedOn.AddDays(-7) &&
-			gws.Id == source.Id)
-			.SingleAsync(
-			cancellationToken: cancellationToken)
+		var info = await retryPolicy.ExecuteAsync(() => client.GameBetGetByExternalBetAsync(
+			gameProviderId: gameProviderId,
+			gameId: gameId,
+			walletId: walletId,
+			externalBetId: externalBetId,
+			externalCreatedOn: externalCreatedOn,
+			cancellationToken: cancellationToken).AsTask())
 			.ConfigureAwait(false);
 
-		entity.BetState = (int)source.BetState;
-		entity.BetType = (int)source.BetType;
-		entity.FreeGameState = (int)source.FreeGameState;
-		entity.GambleState = (int)source.GambleState;
-		entity.CashoutState = (int)source.CashoutState;
-		entity.ResettleState = (int)source.ResettleState;
-		entity.Bet = source.Bet;
-		entity.ValidBet = source.ValidBet;
-		entity.Settle = source.Settle;
-		entity.Commission = source.Commission;
-		entity.Turnover = source.Turnover;
-		entity.WinLoss = source.WinLoss;
-		entity.ExternalResettleOn = source.ExternalResettleOn.UtcDateTime;
-		entity.ResetState = (int)Common.Protos.ResetState.Reset;
-		entity.ResetOn = DateTime.UtcNow;
-		entity.UpdatedOn = DateTime.UtcNow;
-		entity.AdditionalData = source.AdditionalData.ToJsonString();
-
-		_ = context.GameBets.Update(entity: entity);
-
-		_ = await context.SaveChangesAsync(
-			cancellationToken: cancellationToken)
-			.ConfigureAwait(false);
+		return info is null
+			? null :
+			new GameBetInfoModel(
+				Id: info.Id,
+				GameProviderId: info.GameProviderId,
+				GameProviderConfigurationId: info.GameProviderConfigurationId,
+				GameId: info.GameId,
+				ResellerId: info.ResellerId,
+				LicenseeId: info.LicenseeId,
+				BrandId: info.BrandId,
+				PlayerCode: info.PlayerCode,
+				CurrencyCode: info.CurrencyCode,
+				WalletId: info.WalletId,
+				ExternalRoundId: info.ExternalRoundId,
+				ExternalBetId: info.ExternalBetId,
+				ExternalCreatedOn: info.ExternalCreatedOn,
+				ExternalClosedOn: info.ExternalClosedOn,
+				ExternalPayoffOn: info.ExternalPayoffOn,
+				ExternalResettleOn: info.ExternalResettleOn,
+				BetState: info.BetState,
+				BetType: info.BetType,
+				FreeGameState: info.FreeGameState,
+				GambleState: info.GambleState,
+				CashoutState: info.CashoutState,
+				ResettleState: info.ResettleState,
+				JackpotState: info.JackpotState,
+				CurrencyRatio: info.CurrencyRatio,
+				Bet: info.Bet,
+				ValidBet: info.ValidBet,
+				Settle: info.Settle,
+				Commission: info.Commission,
+				Turnover: info.Turnover,
+				WinLoss: info.WinLoss,
+				Jackpot: info.Jackpot,
+				CreatedOn: info.CreatedOn,
+				ClosedOn: info.ClosedOn,
+				UpdatedOn: info.UpdatedOn,
+				AdditionalData: info.AdditionalData);
 	}
 }

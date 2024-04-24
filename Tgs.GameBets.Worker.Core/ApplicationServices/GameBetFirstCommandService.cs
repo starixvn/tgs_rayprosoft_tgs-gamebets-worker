@@ -1,6 +1,4 @@
 ﻿using Google.Protobuf.WellKnownTypes;
-using Tgs.GameBets.First.Worker.Common;
-using Tgs.GameBets.First.Worker.Common.Protos;
 using Tgs.ServiceUtility;
 using Valhalla.MessageQueue;
 
@@ -23,8 +21,8 @@ internal class GameBetFirstCommandService(
 			?? throw new ArgumentNullException(command.ToString());
 
 		await messageSender.PublishAsync(
-			subject: GameBetsFirstWorkerNatsConst.GameBetsFirstWorkerRequest,
-			data: new GameBetsFirstWorkerRequest
+			subject: First.Worker.Common.GameBetsFirstWorkerNatsConst.GameBetsFirstWorkerRequest,
+			data: new First.Worker.Common.Protos.GameBetsFirstWorkerRequest
 			{
 				GameBetId = model.Id,
 				GameProviderId = model.GameProviderId,
@@ -42,13 +40,13 @@ internal class GameBetFirstCommandService(
 				ExternalClosedOn = model.ExternalClosedOn.ToTimestamp(),
 				ExternalPayoffOn = model.ExternalPayoffOn.ToTimestamp(),
 				ExternalResettleOn = model.ExternalResettleOn.ToTimestamp(),
-				BetState = (BetState)model.BetState,
-				BetType = (BetType)model.BetType,
-				FreeGameState = (FreeGameState)model.FreeGameState,
-				GambleState = (GambleState)model.GambleState,
-				CashoutState = (CashoutState)model.CashoutState,
-				ResettleState = (ResettleState)model.ResettleState,
-				JackpotState = (JackpotState)model.JackpotState,
+				BetState = (First.Worker.Common.Protos.BetState)model.BetState,
+				BetType = (First.Worker.Common.Protos.BetType)model.BetType,
+				FreeGameState = (First.Worker.Common.Protos.FreeGameState)model.FreeGameState,
+				GambleState = (First.Worker.Common.Protos.GambleState)model.GambleState,
+				CashoutState = (First.Worker.Common.Protos.CashoutState)model.CashoutState,
+				ResettleState = (First.Worker.Common.Protos.ResettleState)model.ResettleState,
+				JackpotState = (First.Worker.Common.Protos.JackpotState)model.JackpotState,
 				CurrencyRatio = model.CurrencyRatio,
 				Bet = model.Bet,
 				ValidBet = model.ValidBet,
