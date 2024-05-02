@@ -51,7 +51,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 app: {{ include "game-gamebets-worker.name" . }}
 tgs.kind: game
 tgs.game.kind: gamebets
-tgs.gamebets.kind: worker
+tgs.game.gamebets.kind: worker
 tgs.node.selector.kind: gamewagers
 {{- end }}
 
