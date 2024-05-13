@@ -58,11 +58,21 @@ internal class GameBetRepository(
 			.WaitAndRetryAsync(
 				retryCount: retryCount,
 				retryAttempt => TimeSpan.FromSeconds(Math.Pow(retrySeconds, retryAttempt)),
-				onRetry: (exception, retryTime, retryCount, context) => logger.LogWarning("LogOn:{logOn} Exception:{exception} RetryTime:{retryTime} RetryCount:{retryCount}",
+				onRetry: (exception, retryTime, retryCount, context) => logger.LogWarning(exception, "LogOn:{logOn} Exception:{exception} RetryTime:{retryTime} RetryCount:{retryCount} Source:{source}",
 					DateTime.Now.ToString("o"),
 					exception.Message,
 					retryTime,
-					retryCount));
+					retryCount,
+					new
+					{
+						source.GameProviderId,
+						source.GameId,
+						source.PlayerCode,
+						source.WalletId,
+						source.ExternalRoundId,
+						source.ExternalBetId,
+						source.ExternalCreatedOn
+					}));
 
 		await retryPolicy.ExecuteAsync(() => client.GameBetCommandAsync(
 			source: gameBetCommand,
@@ -79,11 +89,19 @@ internal class GameBetRepository(
 			.WaitAndRetryAsync(
 				retryCount: retryCount,
 				retryAttempt => TimeSpan.FromSeconds(Math.Pow(retrySeconds, retryAttempt)),
-				onRetry: (exception, retryTime, retryCount, context) => logger.LogWarning("LogOn:{logOn} Exception:{exception} RetryTime:{retryTime} RetryCount:{retryCount}",
+				onRetry: (exception, retryTime, retryCount, context) => logger.LogWarning(exception, "LogOn:{logOn} Exception:{exception} RetryTime:{retryTime} RetryCount:{retryCount} Source:{source}",
 					DateTime.Now.ToString("o"),
 					exception.Message,
 					retryTime,
-					retryCount));
+					retryCount,
+					new
+					{
+						GameProviderId = gameProviderId,
+						GameId = gameId,
+						WalletId = walletId,
+						ExternalBetId = externalBetId,
+						ExternalCreatedOn = externalCreatedOn
+					}));
 
 		var info = await retryPolicy.ExecuteAsync(() => client.GameBetGetByExternalBetAsync(
 			gameProviderId: gameProviderId,

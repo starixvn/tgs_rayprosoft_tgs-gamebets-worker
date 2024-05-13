@@ -1,7 +1,6 @@
 ﻿using System.Net.Mime;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using NATS.Client.Core;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
