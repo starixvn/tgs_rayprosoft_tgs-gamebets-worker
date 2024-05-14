@@ -15,7 +15,7 @@ internal class GameBetRepository(
 {
 	private readonly PolicySettingsOptions _policySettingsOptions = options.Value;
 
-	public async ValueTask CommandAsync(GameBetCommandModel source, CancellationToken cancellationToken = default)
+	public async ValueTask<GameBets.Common.Enums.GameBetCommandResult> CommandAsync(GameBetCommandModel source, CancellationToken cancellationToken = default)
 	{
 		var gameBetCommand = new GameBetCommandViewModel(
 			Id: source.GameBetId,
@@ -74,7 +74,7 @@ internal class GameBetRepository(
 						source.ExternalCreatedOn
 					}));
 
-		await retryPolicy.ExecuteAsync(() => client.GameBetCommandAsync(
+		return await retryPolicy.ExecuteAsync(() => client.GameBetCommandAsync(
 			source: gameBetCommand,
 			cancellationToken: cancellationToken).AsTask())
 			.ConfigureAwait(false);
