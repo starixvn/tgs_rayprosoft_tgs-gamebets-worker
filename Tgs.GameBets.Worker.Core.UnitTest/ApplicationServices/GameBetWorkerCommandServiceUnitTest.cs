@@ -14,7 +14,6 @@ public class GameBetWorkerCommandServiceUnitTest
 	{
 		var fakeLog = NullLogger<GameBetWorkerCommandService>.Instance;
 		var fakeRepository = Substitute.For<IGameBetRepository>();
-		var fakeGameBetFirstService = Substitute.For<ICommandService<GameBetFirstCommand>>();
 		var fakeGameBetWorkerPublishService = Substitute.For<ICommandService<GameBetWorkerPublishCommand>>();
 
 		var externalRoundId = Guid.NewGuid().ToString();
@@ -102,22 +101,9 @@ public class GameBetWorkerCommandServiceUnitTest
 		var sut = new GameBetWorkerCommandService(
 			fakeLog,
 			fakeRepository,
-			fakeGameBetFirstService,
 			fakeGameBetWorkerPublishService);
 
 		await sut.ExecuteAsync(command);
-
-		_ = fakeGameBetFirstService
-			.Received(1)
-			.ExecuteAsync(
-			command: Arg.Is(new GameBetFirstCommand(
-				GameProviderId: command.GameProviderId,
-				GameId: command.GameId,
-				PlayerCode: command.PlayerCode,
-				WalletId: command.WalletId,
-				ExternalBetId: command.ExternalBetId,
-				ExternalCreatedOn: command.ExternalCreatedOn)),
-			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeGameBetWorkerPublishService
 			.Received(1)
