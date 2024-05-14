@@ -4,7 +4,7 @@ using Tgs.GameBets.Worker.Core;
 using Tgs.GameBets.Worker.Core.ApplicationServices;
 using Valhalla.MessageQueue;
 
-namespace Tgs.GameBets.First.Worker.Messages;
+namespace Tgs.GameBets.Worker.Messages;
 
 internal class GameBetsWorkerMessageHandler(
 	ILogger<GameBetsWorkerMessageHandler> logger,

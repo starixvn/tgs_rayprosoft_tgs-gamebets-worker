@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Nodes;
+using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Tgs.GameBets.Worker.Core.ApplicationServices;
 using Tgs.GameBets.Worker.Core.Models;
@@ -11,8 +12,10 @@ public class GameBetWorkerCommandServiceUnitTest
 	[Fact]
 	public async Task Normal_Process()
 	{
+		var fakeLog = NullLogger<GameBetWorkerCommandService>.Instance;
 		var fakeRepository = Substitute.For<IGameBetRepository>();
 		var fakeGameBetFirstService = Substitute.For<ICommandService<GameBetFirstCommand>>();
+		var fakeGameBetWorkerPublishService = Substitute.For<ICommandService<GameBetWorkerPublishCommand>>();
 
 		var externalRoundId = Guid.NewGuid().ToString();
 		var externalBetId = Guid.NewGuid().ToString();
@@ -58,14 +61,7 @@ public class GameBetWorkerCommandServiceUnitTest
 				["ExternalBetId"] = externalBetId
 			});
 
-		var sut = new GameBetWorkerCommandService(
-			fakeRepository,
-			fakeGameBetFirstService);
-
-		await sut.ExecuteAsync(command);
-
 		_ = fakeRepository
-			.Received(1)
 			.CommandAsync(
 			source: Arg.Is(new GameBetCommandModel(
 				GameBetId: command.GameBetId,
@@ -100,9 +96,20 @@ public class GameBetWorkerCommandServiceUnitTest
 				WinLoss: command.WinLoss,
 				Jackpot: command.Jackpot,
 				AdditionalData: command.AdditionalData)),
-			cancellationToken: Arg.Any<CancellationToken>());
+			cancellationToken: Arg.Any<CancellationToken>())
+			.Returns(GameBets.Common.Enums.GameBetCommandResult.Add);
 
-		_ = fakeGameBetFirstService.ExecuteAsync(
+		var sut = new GameBetWorkerCommandService(
+			fakeLog,
+			fakeRepository,
+			fakeGameBetFirstService,
+			fakeGameBetWorkerPublishService);
+
+		await sut.ExecuteAsync(command);
+
+		_ = fakeGameBetFirstService
+			.Received(1)
+			.ExecuteAsync(
 			command: Arg.Is(new GameBetFirstCommand(
 				GameProviderId: command.GameProviderId,
 				GameId: command.GameId,
@@ -110,6 +117,19 @@ public class GameBetWorkerCommandServiceUnitTest
 				WalletId: command.WalletId,
 				ExternalBetId: command.ExternalBetId,
 				ExternalCreatedOn: command.ExternalCreatedOn)),
+			cancellationToken: Arg.Any<CancellationToken>());
+
+		_ = fakeGameBetWorkerPublishService
+			.Received(1)
+			.ExecuteAsync(
+			command: Arg.Is(new GameBetWorkerPublishCommand(
+				GameProviderId: command.GameProviderId,
+				GameId: command.GameId,
+				PlayerCode: command.PlayerCode,
+				WalletId: command.WalletId,
+				ExternalBetId: command.ExternalBetId,
+				ExternalCreatedOn: command.ExternalCreatedOn,
+				Result: GameBets.Common.Enums.GameBetCommandResult.Add)),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 }

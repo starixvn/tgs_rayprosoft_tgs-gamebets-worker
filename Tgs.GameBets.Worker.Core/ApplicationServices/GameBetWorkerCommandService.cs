@@ -1,20 +1,37 @@
-﻿using Tgs.GameBets.Worker.Core.Models;
+﻿using Microsoft.Extensions.Logging;
+using Tgs.GameBets.Worker.Core.Models;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameBets.Worker.Core.ApplicationServices;
 
 internal class GameBetWorkerCommandService(
+	ILogger<GameBetWorkerCommandService> logger,
 	IGameBetRepository repository,
-	ICommandService<GameBetFirstCommand> gameBetFirstService) : ICommandService<GameBetWorkerCommand>
+	ICommandService<GameBetFirstCommand> gameBetFirstService,
+	ICommandService<GameBetWorkerPublishCommand> gameBetWorkerPublishService) : ICommandService<GameBetWorkerCommand>
 {
 	public async ValueTask ExecuteAsync(GameBetWorkerCommand command, CancellationToken cancellationToken = default)
 	{
 		if (command.BetState is GameBets.Common.Enums.BetState.Waiting or GameBets.Common.Enums.BetState.Running)
 		{
+			logger.LogWarning("LogOn:{logOn} Message:The bet status of this game is not settled.{info}",
+				DateTime.Now.ToString("o"),
+				new
+				{
+					command.GameProviderId,
+					command.GameId,
+					command.PlayerCode,
+					command.WalletId,
+					command.ExternalRoundId,
+					command.ExternalBetId,
+					command.ExternalCreatedOn,
+					command.BetState
+				});
+
 			return;
 		}
 
-		await repository.CommandAsync(
+		var gameBetCommandResult = await repository.CommandAsync(
 			source: new GameBetCommandModel(
 				GameBetId: command.GameBetId,
 				GameProviderId: command.GameProviderId,
@@ -52,13 +69,26 @@ internal class GameBetWorkerCommandService(
 			.ConfigureAwait(false);
 
 		await gameBetFirstService.ExecuteAsync(
-		command: new GameBetFirstCommand(
-			GameProviderId: command.GameProviderId,
-			GameId: command.GameId,
-			PlayerCode: command.PlayerCode,
-			WalletId: command.WalletId,
-			ExternalBetId: command.ExternalBetId,
-			ExternalCreatedOn: command.ExternalCreatedOn),
-		cancellationToken).ConfigureAwait(false);
+			command: new GameBetFirstCommand(
+				GameProviderId: command.GameProviderId,
+				GameId: command.GameId,
+				PlayerCode: command.PlayerCode,
+				WalletId: command.WalletId,
+				ExternalBetId: command.ExternalBetId,
+				ExternalCreatedOn: command.ExternalCreatedOn),
+			cancellationToken)
+			.ConfigureAwait(false);
+
+		await gameBetWorkerPublishService.ExecuteAsync(
+			command: new GameBetWorkerPublishCommand(
+				GameProviderId: command.GameProviderId,
+				GameId: command.GameId,
+				PlayerCode: command.PlayerCode,
+				WalletId: command.WalletId,
+				ExternalBetId: command.ExternalBetId,
+				ExternalCreatedOn: command.ExternalCreatedOn,
+				Result: gameBetCommandResult),
+			cancellationToken)
+			.ConfigureAwait(false);
 	}
 }

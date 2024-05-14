@@ -6,11 +6,10 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Tgs.GameBets.First.Worker.Common;
-
-using Tgs.GameBets.First.Worker.Messages;
 using Tgs.GameBets.Worker.Common;
 using Tgs.GameBets.Worker.Core;
 using Tgs.MessageQueue.Nats.Serializers;
+using Tgs.GameBets.Worker.Messages;
 
 var filterInstrumentations = new[] { "html", "ico", "png", "jpg" };
 
@@ -70,6 +69,9 @@ builder.Services
 	.AddHandler<GameBetsWorkerMessageHandler>(GameBetsWorkerNatsConst.GameBetsWorkerRequest, typeof(GameBetsWorkerMessageHandler).FullName!.ToLower()))
 	.ClearAllExchanges()
 	.AddNatsGlobPatternExchange(GameBetsWorkerNatsConst.GameBetsWorkerRequest)
+	.AddNatsGlobPatternExchange(GameBetsWorkerNatsConst.GameBetsWorkerPublish)
+	.AddNatsGlobPatternExchange(GameBetsWorkerNatsConst.GameBetsWorkerAddPublish)
+	.AddNatsGlobPatternExchange(GameBetsWorkerNatsConst.GameBetsWorkerUpdatePublish)
 	.AddNatsGlobPatternExchange(GameBetsFirstWorkerNatsConst.GameBetsFirstWorkerRequest);
 
 builder.Services
