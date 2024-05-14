@@ -10,7 +10,6 @@ data:
         "LogLevel": {
           "Default": "Warning",
           "Tgs.GameBets.Worker.Messages.GameBetsWorkerMessageHandler": "Information",
-          "Tgs.GameBets.Worker.Core.ApplicationServices.GameBetFirstCommandService": "Information",
           "Tgs.GameBets.Worker.Core.ApplicationServices.GameBetWorkerPublishCommandService": "Information"
         }
       },

@@ -5,8 +5,6 @@ using NATS.Client.Core;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using Tgs.GameBets.First.Worker.Common;
-using Tgs.GameBets.Worker.Common;
 using Tgs.GameBets.Worker.Core;
 using Tgs.MessageQueue.Nats.Serializers;
 using Tgs.GameBets.Worker.Messages;
@@ -66,13 +64,12 @@ builder.Services
 	.AddMessageQueue()
 	.AddNatsMessageQueue(config => config
 	.ConfigureResolveConnection(sp => sp.GetRequiredKeyedService<NatsConnection>("Nats"))
-	.AddHandler<GameBetsWorkerMessageHandler>(GameBetsWorkerNatsConst.GameBetsWorkerRequest, typeof(GameBetsWorkerMessageHandler).FullName!.ToLower()))
+	.AddHandler<GameBetsWorkerMessageHandler>(Tgs.GameBets.Worker.Common.GameBetsWorkerNatsConst.GameBetsWorkerRequest, typeof(GameBetsWorkerMessageHandler).FullName!.ToLower()))
 	.ClearAllExchanges()
-	.AddNatsGlobPatternExchange(GameBetsWorkerNatsConst.GameBetsWorkerRequest)
-	.AddNatsGlobPatternExchange(GameBetsWorkerNatsConst.GameBetsWorkerPublish)
-	.AddNatsGlobPatternExchange(GameBetsWorkerNatsConst.GameBetsWorkerAddPublish)
-	.AddNatsGlobPatternExchange(GameBetsWorkerNatsConst.GameBetsWorkerUpdatePublish)
-	.AddNatsGlobPatternExchange(GameBetsFirstWorkerNatsConst.GameBetsFirstWorkerRequest);
+	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.Common.GameBetsWorkerNatsConst.GameBetsWorkerRequest)
+	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.Common.GameBetsWorkerNatsConst.GameBetsWorkerPublish)
+	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.Common.GameBetsWorkerNatsConst.GameBetsWorkerAddPublish)
+	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.Common.GameBetsWorkerNatsConst.GameBetsWorkerUpdatePublish);
 
 builder.Services
 	.AddOpenTelemetry()

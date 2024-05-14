@@ -7,7 +7,6 @@ namespace Tgs.GameBets.Worker.Core.ApplicationServices;
 internal class GameBetWorkerCommandService(
 	ILogger<GameBetWorkerCommandService> logger,
 	IGameBetRepository repository,
-	ICommandService<GameBetFirstCommand> gameBetFirstService,
 	ICommandService<GameBetWorkerPublishCommand> gameBetWorkerPublishService) : ICommandService<GameBetWorkerCommand>
 {
 	public async ValueTask ExecuteAsync(GameBetWorkerCommand command, CancellationToken cancellationToken = default)
@@ -65,17 +64,6 @@ internal class GameBetWorkerCommandService(
 				WinLoss: command.WinLoss,
 				Jackpot: command.Jackpot,
 				AdditionalData: command.AdditionalData),
-			cancellationToken)
-			.ConfigureAwait(false);
-
-		await gameBetFirstService.ExecuteAsync(
-			command: new GameBetFirstCommand(
-				GameProviderId: command.GameProviderId,
-				GameId: command.GameId,
-				PlayerCode: command.PlayerCode,
-				WalletId: command.WalletId,
-				ExternalBetId: command.ExternalBetId,
-				ExternalCreatedOn: command.ExternalCreatedOn),
 			cancellationToken)
 			.ConfigureAwait(false);
 
