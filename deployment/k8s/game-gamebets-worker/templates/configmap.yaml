@@ -9,8 +9,8 @@ data:
       "Logging": {
         "LogLevel": {
           "Default": "Warning",
-          "Tgs.GameBets.Worker.Messages.GameBetsWorkerMessageHandler": "Information",
-          "Tgs.GameBets.Worker.Core.ApplicationServices.GameBetWorkerPublishCommandService": "Information"
+          "Tgs.GameBets.Worker.Messages.GameBetsWorkerMessageHandler": "Warning",
+          "Tgs.GameBets.Worker.Core.ApplicationServices.GameBetWorkerPublishCommandService": "Warning"
         }
       },
       "GameBetsWorkerStrings": {
