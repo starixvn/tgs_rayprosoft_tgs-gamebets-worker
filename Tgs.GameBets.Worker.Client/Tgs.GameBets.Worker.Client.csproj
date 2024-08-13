@@ -7,7 +7,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<Version>1.0.6</Version>
+		<Version>1.0.7</Version>
 		<Authors>Raypro</Authors>
 		<PackageProjectUrl>https://gitlab.com/rayprosoft/tgs-gamebets-worker</PackageProjectUrl>
 		<RepositoryUrl>https://gitlab.com/rayprosoft/tgs-gamebets-worker.git</RepositoryUrl>
@@ -20,10 +20,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Grpc.AspNetCore" Version="2.65.0" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
 		<PackageReference Include="PhoenixToolkits.NuGet.BuildTools" Version="0.0.3">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="PhoenixToolkits.Protobuf.ExtendTypes" Version="0.0.7" />
+		<PackageReference Include="System.Interactive.Async" Version="6.0.1" />
 	</ItemGroup>
 	
 	<ItemGroup>

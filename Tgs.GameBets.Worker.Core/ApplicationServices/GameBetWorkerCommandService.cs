@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Tgs.GameBets.Worker.Core.Models;
 using Tgs.ServiceUtility;
 
@@ -13,20 +14,23 @@ internal class GameBetWorkerCommandService(
 	{
 		if (command.BetState is GameBets.Common.Enums.BetState.Waiting or GameBets.Common.Enums.BetState.Running)
 		{
-			logger.LogWarning("LogOn:{logOn} Message:The bet status of this game is not settled.{info}",
-				DateTime.Now.ToString("o"),
-				new
+			logger.LogWarning("{logWarning}",
+				JsonSerializer.Serialize(new
 				{
-					command.GameProviderId,
-					command.GameId,
-					command.PlayerCode,
-					command.WalletId,
-					command.ExternalRoundId,
-					command.ExternalBetId,
-					command.ExternalCreatedOn,
-					command.BetState
-				});
-
+					LogOn = DateTime.Now.ToString("u"),
+					Data = new
+					{
+						command.GameProviderId,
+						command.GameId,
+						command.PlayerCode,
+						command.WalletId,
+						command.ExternalRoundId,
+						command.ExternalBetId,
+						ExternalCreatedOn = command.ExternalCreatedOn.ToString("u"),
+						command.BetState
+					},
+					Message = "The bet status of this game is not settled."
+				}));
 			return;
 		}
 

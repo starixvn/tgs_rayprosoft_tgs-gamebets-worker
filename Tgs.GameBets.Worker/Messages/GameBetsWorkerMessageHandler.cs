@@ -1,5 +1,5 @@
-﻿using System.Text.Json.Nodes;
-using Tgs.GameBets.Worker.Common.Protos;
+﻿using System.Text.Json;
+using System.Text.Json.Nodes;
 using Tgs.GameBets.Worker.Core;
 using Tgs.GameBets.Worker.Core.ApplicationServices;
 using Valhalla.MessageQueue;
@@ -8,23 +8,27 @@ namespace Tgs.GameBets.Worker.Messages;
 
 internal class GameBetsWorkerMessageHandler(
 	ILogger<GameBetsWorkerMessageHandler> logger,
-	IGameBetsWorkerDispatcher dispatcher) : IMessageHandler<GameBetsWorkerRequest>
+	IGameBetsWorkerDispatcher dispatcher) : IMessageHandler<Common.Protos.GameBetsWorkerRequest>
 {
-	public ValueTask HandleAsync(string subject, GameBetsWorkerRequest data, IEnumerable<MessageHeaderValue>? headerValues, CancellationToken cancellationToken = default)
+	public ValueTask HandleAsync(string subject, Common.Protos.GameBetsWorkerRequest data, IEnumerable<MessageHeaderValue>? headerValues, CancellationToken cancellationToken = default)
 	{
-		logger.LogInformation("LogOn:{logOn} Subject:{subject} Mesaage:This message has been received.({data})",
-			DateTime.Now.ToString("o"),
-			subject,
-			new
+		logger.LogInformation("{logInformation}",
+			JsonSerializer.Serialize(new
 			{
-				GameProviderId = data.GameProviderId.ToGuid(),
-				data.GameId,
-				data.PlayerCode,
-				WalletId = data.WalletId.ToGuid(),
-				data.ExternalRoundId,
-				data.ExternalBetId,
-				ExternalCreatedOn = data.ExternalCreatedOn.ToDateTimeOffset()
-			});
+				LogOn = DateTime.Now.ToString("u"),
+				Subject = subject,
+				Data = new
+				{
+					GameProviderId = data.GameProviderId.ToGuid(),
+					data.GameId,
+					data.PlayerCode,
+					WalletId = data.WalletId.ToGuid(),
+					data.ExternalRoundId,
+					data.ExternalBetId,
+					ExternalCreatedOn = data.ExternalCreatedOn.ToDateTimeOffset().ToString("u")
+				},
+				Message = "This receive message handler."
+			}));
 
 		return dispatcher.PushCommandAsync(
 			command: new GameBetWorkerCommand(

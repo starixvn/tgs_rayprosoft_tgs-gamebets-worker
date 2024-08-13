@@ -6,7 +6,7 @@ import "google/protobuf/timestamp.proto";
 
 option csharp_namespace = "Tgs.GameBets.Worker.Common.Protos";
 
-package GameBetsWorkerCommon;
+package GameBetsWorker;
 
 // The greeting service definition.
 
@@ -49,6 +49,13 @@ message GameBetsWorkerRequest {
 	google.protobuf.Timestamp updated_on = 34;
 	string additional_data = 35;
 }
+
+message GameBetsWorkerExpiryRequest {
+	phoenix.protobuf.GuidValue game_provider_id = 1;
+	int32 game_id = 2;
+	phoenix.protobuf.GuidValue brand_id = 3;
+}
+
 
 message GameBetsWorkerPublish {
     phoenix.protobuf.GuidValue game_bet_id = 1;

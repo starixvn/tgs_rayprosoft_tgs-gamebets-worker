@@ -18,10 +18,10 @@ internal class GameBetsWorkerDispatcher(IServiceProvider serviceProvider) : IGam
 
 	public async ValueTask PushCommandAsync(GameBetWorkerCommand command, CancellationToken cancellationToken = default)
 	{
+		var key = GetKey(command.BrandId, command.GameProviderId, command.GameId);
 		using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cancellationTokenSource.Token);
-
 		var counter = _counters.GetOrAdd(
-			string.Concat(command.ResellerId, ":", command.LicenseeId, ":", command.BrandId, ":", command.GameProviderId, ":", command.GameId),
+			key,
 			key =>
 			{
 				var scope = serviceProvider.CreateScope();
@@ -57,6 +57,13 @@ internal class GameBetsWorkerDispatcher(IServiceProvider serviceProvider) : IGam
 		GC.SuppressFinalize(this);
 	}
 
+	public void ExtendExpiry(Guid brandId, Guid gameProviderId, int gameId, CancellationToken cancellationToken = default)
+	{
+		var key = GetKey(brandId, gameProviderId, gameId);
+		if (_counters.TryGetValue(key, out var counter))
+			counter.ExtendExpiry();
+	}
+
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!_disposedValue)
@@ -70,4 +77,7 @@ internal class GameBetsWorkerDispatcher(IServiceProvider serviceProvider) : IGam
 			_disposedValue = true;
 		}
 	}
+
+	private static string GetKey(Guid brandId, Guid gameProviderId, int gameId)
+		=> string.Concat("BrandId", ":", brandId, ":", "GameProviderId", ":", gameProviderId, ":", "GameId", ":", gameId);
 }

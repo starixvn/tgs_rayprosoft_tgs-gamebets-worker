@@ -5,4 +5,6 @@ namespace Tgs.GameBets.Worker.Core;
 public interface IGameBetsWorkerDispatcher
 {
 	ValueTask PushCommandAsync(GameBetWorkerCommand command, CancellationToken cancellationToken = default);
+
+	void ExtendExpiry(Guid brandId, Guid gameProviderId, int gameId, CancellationToken cancellationToken = default);
 }

@@ -1,7 +1,9 @@
-﻿using Google.Protobuf.WellKnownTypes;
+﻿using System.Text.Json;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 using Tgs.ServiceUtility;
 using Valhalla.MessageQueue;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Tgs.GameBets.Worker.Core.ApplicationServices;
 
@@ -14,18 +16,23 @@ internal class GameBetWorkerPublishCommandService(
 	{
 		if (command.Result == GameBets.Common.Enums.GameBetCommandResult.Running)
 		{
-			logger.LogWarning("LogOn:{logOn} Message:The bet status of this game is not settled.{info}",
-				DateTime.Now.ToString("o"),
-				new
+			logger.LogWarning("{logWarning}",
+				JsonSerializer.Serialize(new
 				{
-					command.GameProviderId,
-					command.GameId,
-					command.PlayerCode,
-					command.WalletId,
-					command.ExternalBetId,
-					command.ExternalCreatedOn,
-					command.Result
-				});
+					LogOn = DateTime.Now.ToString("u"),
+					Data = new
+					{
+						command.GameProviderId,
+						command.GameId,
+						command.PlayerCode,
+						command.WalletId,
+						command.ExternalBetId,
+						ExternalCreatedOn = command.ExternalCreatedOn.ToString("u"),
+						command.Result
+					},
+					Message = "The bet status of this game is not settled."
+				}));
+
 			return;
 		}
 
@@ -93,37 +100,12 @@ internal class GameBetWorkerPublishCommandService(
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 
-		logger.LogInformation("LogOn:{logOn} Subject:{subject} Mesaage:This game bet is published.({publish})",
-			DateTime.Now.ToString("o"),
-			Common.GameBetsWorkerNatsConst.GameBetsWorkerPublish,
-			new
+		logger.LogInformation("{logInformation}",
+			JsonSerializer.Serialize(new
 			{
-				GameBetId = publish.GameBetId.ToGuid(),
-				GameProviderId = publish.GameProviderId.ToGuid(),
-				publish.GameId,
-				ResellerId = publish.ResellerId.ToGuid(),
-				LicenseeId = publish.LicenseeId.ToGuid(),
-				BrandId = publish.BrandId.ToGuid(),
-				publish.PlayerCode,
-				publish.CurrencyCode,
-				WalletId = publish.WalletId.ToGuid(),
-				publish.ExternalRoundId,
-				publish.ExternalBetId,
-				ExternalCreatedOn = publish.ExternalCreatedOn.ToDateTimeOffset()
-			});
-
-		if (command.Result == GameBets.Common.Enums.GameBetCommandResult.Add)
-		{
-			await messageSender.PublishAsync(
-				subject: Common.GameBetsWorkerNatsConst.GameBetsWorkerAddPublish,
-				data: publish,
-				cancellationToken: cancellationToken)
-				.ConfigureAwait(false);
-
-			logger.LogInformation("LogOn:{logOn} Subject:{subject} Mesaage:This game bet is added and published.({publish})",
-				DateTime.Now.ToString("o"),
-				Common.GameBetsWorkerNatsConst.GameBetsWorkerAddPublish,
-				new
+				LogOn = DateTime.Now.ToString("u"),
+				Subject = Common.GameBetsWorkerNatsConst.GameBetsWorkerPublish,
+				Data = new
 				{
 					GameBetId = publish.GameBetId.ToGuid(),
 					GameProviderId = publish.GameProviderId.ToGuid(),
@@ -136,8 +118,41 @@ internal class GameBetWorkerPublishCommandService(
 					WalletId = publish.WalletId.ToGuid(),
 					publish.ExternalRoundId,
 					publish.ExternalBetId,
-					ExternalCreatedOn = publish.ExternalCreatedOn.ToDateTimeOffset()
-				});
+					ExternalCreatedOn = publish.ExternalCreatedOn.ToDateTimeOffset().ToString("u")
+				},
+				Message = "This game bet is published."
+			}));
+
+		if (command.Result == GameBets.Common.Enums.GameBetCommandResult.Add)
+		{
+			await messageSender.PublishAsync(
+				subject: Common.GameBetsWorkerNatsConst.GameBetsWorkerAddPublish,
+				data: publish,
+				cancellationToken: cancellationToken)
+				.ConfigureAwait(false);
+
+			logger.LogInformation("{logInformation}",
+				JsonSerializer.Serialize(new
+				{
+					LogOn = DateTime.Now.ToString("u"),
+					Subject = Common.GameBetsWorkerNatsConst.GameBetsWorkerAddPublish,
+					Data = new
+					{
+						GameBetId = publish.GameBetId.ToGuid(),
+						GameProviderId = publish.GameProviderId.ToGuid(),
+						publish.GameId,
+						ResellerId = publish.ResellerId.ToGuid(),
+						LicenseeId = publish.LicenseeId.ToGuid(),
+						BrandId = publish.BrandId.ToGuid(),
+						publish.PlayerCode,
+						publish.CurrencyCode,
+						WalletId = publish.WalletId.ToGuid(),
+						publish.ExternalRoundId,
+						publish.ExternalBetId,
+						ExternalCreatedOn = publish.ExternalCreatedOn.ToDateTimeOffset().ToString("u")
+					},
+					Message = "This game bet is added and published."
+				}));
 		}
 
 		if (command.Result == GameBets.Common.Enums.GameBetCommandResult.Update)
@@ -148,24 +163,28 @@ internal class GameBetWorkerPublishCommandService(
 				cancellationToken: cancellationToken)
 				.ConfigureAwait(false);
 
-			logger.LogInformation("LogOn:{logOn} Subject:{subject} Mesaage:This game bet is updateed and published.({publish})",
-				DateTime.Now.ToString("o"),
-				Common.GameBetsWorkerNatsConst.GameBetsWorkerUpdatePublish,
-				new
+			logger.LogInformation("{logInformation}",
+				JsonSerializer.Serialize(new
 				{
-					GameBetId = publish.GameBetId.ToGuid(),
-					GameProviderId = publish.GameProviderId.ToGuid(),
-					publish.GameId,
-					ResellerId = publish.ResellerId.ToGuid(),
-					LicenseeId = publish.LicenseeId.ToGuid(),
-					BrandId = publish.BrandId.ToGuid(),
-					publish.PlayerCode,
-					publish.CurrencyCode,
-					WalletId = publish.WalletId.ToGuid(),
-					publish.ExternalRoundId,
-					publish.ExternalBetId,
-					ExternalCreatedOn = publish.ExternalCreatedOn.ToDateTimeOffset()
-				});
+					LogOn = DateTime.Now.ToString("u"),
+					Subject = Common.GameBetsWorkerNatsConst.GameBetsWorkerAddPublish,
+					Data = new
+					{
+						GameBetId = publish.GameBetId.ToGuid(),
+						GameProviderId = publish.GameProviderId.ToGuid(),
+						publish.GameId,
+						ResellerId = publish.ResellerId.ToGuid(),
+						LicenseeId = publish.LicenseeId.ToGuid(),
+						BrandId = publish.BrandId.ToGuid(),
+						publish.PlayerCode,
+						publish.CurrencyCode,
+						WalletId = publish.WalletId.ToGuid(),
+						publish.ExternalRoundId,
+						publish.ExternalBetId,
+						ExternalCreatedOn = publish.ExternalCreatedOn.ToDateTimeOffset().ToString("u")
+					},
+					Message = "This game bet is updateed and published."
+				}));
 		}
 	}
 }

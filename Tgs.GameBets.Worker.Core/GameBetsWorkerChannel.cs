@@ -1,6 +1,9 @@
 ﻿using System.Diagnostics;
+using System.Text.Json;
 using System.Threading.Channels;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Tgs.GameBets.Worker.Core.ApplicationServices;
 using Tgs.ServiceUtility;
 
@@ -8,7 +11,8 @@ namespace Tgs.GameBets.Worker.Core;
 
 internal class GameBetsWorkerChannel(
 	ILogger<GameBetsWorkerChannel> logger,
-	ICommandService<GameBetWorkerCommand> service,
+	IOptions<GameBetsWorkerSettingsOptions> options,
+	IServiceProvider serviceProvider,
 	string key) : IDisposable, IAsyncDisposable
 {
 	private static readonly ActivitySource _ActivitySource = new(name: typeof(GameBetsWorkerChannel).FullName!);
@@ -23,6 +27,8 @@ internal class GameBetsWorkerChannel(
 	private readonly CancellationTokenSource _cancellationTokenSource = new();
 
 	private Task? _backgroundTask;
+	private int _expiry = options.Value.ChannelExpiry;
+	private Timer? _timer;
 	private bool _disposedValue;
 
 	public event EventHandler? Disposed;
@@ -49,6 +55,14 @@ internal class GameBetsWorkerChannel(
 			if (_backgroundTask is not null)
 				return;
 
+			_timer = new Timer(_ =>
+			{
+				_ = Interlocked.Decrement(ref _expiry);
+
+				if (_expiry <= 0)
+					Dispose();
+			}, null, 0, 1000);
+
 			_backgroundTask = Task.Run(
 				() => ProcessCommandLoopAsync(_cancellationTokenSource.Token),
 				_cancellationTokenSource.Token);
@@ -62,12 +76,17 @@ internal class GameBetsWorkerChannel(
 	public async ValueTask PushCommandAsync(GameBetWorkerCommand command, CancellationToken cancellationToken = default)
 	{
 		using var cts = CancellationTokenSource.CreateLinkedTokenSource(
-			cancellationToken,
-			_cancellationTokenSource.Token);
+			token1: cancellationToken,
+			token2: _cancellationTokenSource.Token);
 
 		await _channel.Writer.WriteAsync(
-			command,
-			cts.Token).ConfigureAwait(false);
+			item: command,
+			cancellationToken: cts.Token).ConfigureAwait(false);
+	}
+
+	public void ExtendExpiry()
+	{
+		_ = Interlocked.Exchange(ref _expiry, options.Value.ChannelExpiry);
 	}
 
 	public ValueTask DisposeAsync()
@@ -91,6 +110,9 @@ internal class GameBetsWorkerChannel(
 		{
 			if (disposing)
 			{
+				_timer?.Dispose();
+				_timer = null;
+
 				Disposed?.Invoke(this, EventArgs.Empty);
 				_channel.Writer.Complete();
 				_cancellationTokenSource.Cancel();
@@ -118,20 +140,25 @@ internal class GameBetsWorkerChannel(
 					parentContext: default);
 				try
 				{
-					logger.LogInformation("LogOn:{logOn} Key:{key} Mesaage:This processing.({data})",
-						DateTime.Now.ToString("o"),
-						Key,
-						new
+					logger.LogInformation("{logInformation}",
+						JsonSerializer.Serialize(new
 						{
-							command.GameProviderId,
-							command.GameId,
-							command.PlayerCode,
-							command.WalletId,
-							command.ExternalRoundId,
-							command.ExternalBetId,
-							command.ExternalCreatedOn
-						});
-
+							LogOn = DateTime.Now.ToString("u"),
+							Key,
+							Data = new
+							{
+								command.GameProviderId,
+								command.GameId,
+								command.PlayerCode,
+								command.WalletId,
+								command.ExternalRoundId,
+								command.ExternalBetId,
+								ExternalCreatedOn = command.ExternalCreatedOn.ToString("u")
+							},
+							Message = "This processing."
+						}));
+					using var scope = serviceProvider.CreateScope();
+					var service = scope.ServiceProvider.GetRequiredService<ICommandService<GameBetWorkerCommand>>();
 					await service.ExecuteAsync(
 						command: command,
 						cancellationToken: cancellationToken)
@@ -139,19 +166,23 @@ internal class GameBetsWorkerChannel(
 				}
 				catch (Exception ex)
 				{
-					logger.LogError(ex, "LogOn:{logOn} Key:{key} Mesaage:This exception occurs.({data})",
-						DateTime.Now.ToString("o"),
-						Key,
-						new
+					logger.LogError(ex, "{logError}",
+						JsonSerializer.Serialize(new
 						{
-							command.GameProviderId,
-							command.GameId,
-							command.PlayerCode,
-							command.WalletId,
-							command.ExternalRoundId,
-							command.ExternalBetId,
-							command.ExternalCreatedOn
-						});
+							LogOn = DateTime.Now.ToString("u"),
+							Key,
+							Data = new
+							{
+								command.GameProviderId,
+								command.GameId,
+								command.PlayerCode,
+								command.WalletId,
+								command.ExternalRoundId,
+								command.ExternalBetId,
+								ExternalCreatedOn = command.ExternalCreatedOn.ToString("u")
+							},
+							Message = "This exception occurs."
+						}));
 				}
 			}
 		}

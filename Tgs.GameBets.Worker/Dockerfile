@@ -13,8 +13,9 @@ COPY ["nuget.config", "."]
 COPY ["Tgs.GameBets.Worker/Tgs.GameBets.Worker.csproj", "Tgs.GameBets.Worker/"]
 COPY ["Tgs.GameBets.Worker.Common/Tgs.GameBets.Worker.Common.csproj", "Tgs.GameBets.Worker.Common/"]
 COPY ["Tgs.GameBets.Worker.Core/Tgs.GameBets.Worker.Core.csproj", "Tgs.GameBets.Worker.Core/"]
+COPY ["Tgs.GameBets.Worker.Protos/Tgs.GameBets.Worker.Protos.csproj", "Tgs.GameBets.Worker.Protos/"]
 COPY ["Tgs.GameBets.Worker.Repositories/Tgs.GameBets.Worker.Repositories.csproj", "Tgs.GameBets.Worker.Repositories/"]
-RUN dotnet restore "./Tgs.GameBets.Worker/./Tgs.GameBets.Worker.csproj"
+RUN dotnet restore "./Tgs.GameBets.Worker/Tgs.GameBets.Worker.csproj"
 COPY . .
 WORKDIR "/src/Tgs.GameBets.Worker"
 RUN dotnet build "./Tgs.GameBets.Worker.csproj" -c $BUILD_CONFIGURATION -o /app/build
