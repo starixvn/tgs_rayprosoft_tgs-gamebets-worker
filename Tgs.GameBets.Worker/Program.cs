@@ -6,8 +6,9 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Tgs.GameBets.Worker.Core;
-using Tgs.MessageQueue.Nats.Serializers;
 using Tgs.GameBets.Worker.Messages;
+
+using Tgs.MessageQueue.Nats.Serializers;
 
 var filterInstrumentations = new[] { "html", "ico", "png", "jpg" };
 
@@ -45,15 +46,20 @@ builder.Services.AddSwaggerGen(c =>
 		c.IncludeXmlComments(xmlFileName);
 });
 
-builder.Services.AddGameBetsWorker()
+builder.Services
 	.AddOptions<PolicySettingsOptions>()
 	.Configure((options) => builder.Configuration.GetSection("PolicySettings").Bind(options))
+	.Services
+	.AddOptions<GameBetsWorkerSettingsOptions>()
+	.Configure((options) => builder.Configuration.GetSection("GameBetsWorkerSettings").Bind(options))
 	.Services
 	.AddGameBetsClient(httpClientBuilder => httpClientBuilder.ConfigureHttpClient((sp, http) =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
 		http.BaseAddress = config.GetValue<Uri>("GameBetsWorkerStrings:GameBetsClientBaseUrl");
-	}));
+	}))
+	.AddGameBetsWorkerCore()
+	.AddGameBetsWorkerRepositories();
 
 builder.Services
 	.AddKeyedSingleton("Nats", (sp, _) => new NatsConnection(NatsOpts.Default with
@@ -64,9 +70,11 @@ builder.Services
 	.AddMessageQueue()
 	.AddNatsMessageQueue(config => config
 	.ConfigureResolveConnection(sp => sp.GetRequiredKeyedService<NatsConnection>("Nats"))
-	.AddHandler<GameBetsWorkerMessageHandler>(Tgs.GameBets.Worker.Common.GameBetsWorkerNatsConst.GameBetsWorkerRequest, typeof(GameBetsWorkerMessageHandler).FullName!.ToLower()))
+	.AddHandler<GameBetsWorkerMessageHandler>(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetsWorkerRequest, Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetsWorkerRequest)
+	.AddHandler<GameBetsWorkerExpiryMessageHandler>(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetsWorkerExpiryRequest, Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetsWorkerExpiryRequest))
 	.ClearAllExchanges()
-	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.Common.GameBetsWorkerNatsConst.GameBetsWorkerRequest)
+	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetsWorkerRequest)
+	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetsWorkerExpiryRequest)
 	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.Common.GameBetsWorkerNatsConst.GameBetsWorkerPublish)
 	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.Common.GameBetsWorkerNatsConst.GameBetsWorkerAddPublish)
 	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.Common.GameBetsWorkerNatsConst.GameBetsWorkerUpdatePublish);
