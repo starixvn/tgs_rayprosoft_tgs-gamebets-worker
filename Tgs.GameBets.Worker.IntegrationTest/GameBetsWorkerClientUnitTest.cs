@@ -61,7 +61,7 @@ public class GameBetsWorkerClientUnitTest
 			subject: Arg.Is(GameBetsWorkerNatsConst.GameBetsWorkerRequest),
 			data: Arg.Is(new Common.Protos.GameBetsWorkerRequest
 			{
-				GameBetId = source.BrandId,
+				GameBetId = source.GameBetId,
 				GameProviderId = source.GameProviderId,
 				GameProviderConfigurationId = source.GameProviderConfigurationId,
 				GameId = source.GameId,

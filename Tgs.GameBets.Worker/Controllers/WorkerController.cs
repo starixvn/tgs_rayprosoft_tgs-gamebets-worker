@@ -63,7 +63,7 @@ public class WorkerController : ControllerBase
 				subject: GameBetsWorkerNatsConst.GameBetsWorkerRequest,
 				data: new Common.Protos.GameBetsWorkerRequest
 				{
-					GameBetId = source.BrandId,
+					GameBetId = source.GameBetId,
 					GameProviderId = source.GameProviderId,
 					GameProviderConfigurationId = source.GameProviderConfigurationId,
 					GameId = source.GameId,
