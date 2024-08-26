@@ -7,13 +7,13 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Tgs.GameBets.Worker.Core;
 using Tgs.GameBets.Worker.Messages;
-
+using Tgs.GameBets.Worker.Middlewares;
 using Tgs.MessageQueue.Nats.Serializers;
 
 var filterInstrumentations = new[] { "html", "ico", "png", "jpg" };
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.WebHost.UseSentry();
 builder.Logging
 	.AddOpenTelemetry(options =>
 	{
@@ -78,7 +78,7 @@ builder.Services
 	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.Common.GameBetsWorkerNatsConst.GameBetsWorkerPublish)
 	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.Common.GameBetsWorkerNatsConst.GameBetsWorkerAddPublish)
 	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.Common.GameBetsWorkerNatsConst.GameBetsWorkerUpdatePublish);
-
+builder.Services.AddScoped<ExceptionMiddleware>();
 builder.Services
 	.AddOpenTelemetry()
 	.ConfigureResource(_ => _.AddService(builder.Configuration.GetValue<string>("Otel:ServiceName")!))
@@ -114,13 +114,12 @@ builder.Services
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
-
 _ = app.UseSwagger();
 _ = app.UseSwaggerUI();
 
 _ = app.MapControllers();
 _ = app.MapSwagger();
-
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseHealthChecks("/health");
 app.MapHealthChecks("/");
 
