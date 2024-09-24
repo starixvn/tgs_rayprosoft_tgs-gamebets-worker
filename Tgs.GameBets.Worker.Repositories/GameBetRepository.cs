@@ -109,7 +109,7 @@ internal class GameBetRepository(
 						exception.Message
 					}));
 
-		var info = await retryPolicy.ExecuteAsync(() => client.GameBetGetByExternalBetAsync(
+		var info = await retryPolicy.ExecuteAsync(() => client.GameBetMajorGetAsync(
 			gameProviderId: gameProviderId,
 			gameId: gameId,
 			walletId: walletId,
