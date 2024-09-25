@@ -7,14 +7,14 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.GameBets.Worker.Core.UnitTest.ApplicationServices;
 
-public class GameBetWorkerCommandServiceUnitTest
+public class GameBetWorkerServiceUnitTest
 {
 	[Fact]
 	public async Task Normal_Process()
 	{
-		var fakeLog = NullLogger<GameBetWorkerCommandService>.Instance;
+		var fakeLog = NullLogger<GameBetWorkerService>.Instance;
 		var fakeRepository = Substitute.For<IGameBetRepository>();
-		var fakeGameBetWorkerPublishService = Substitute.For<ICommandService<GameBetWorkerPublishCommand>>();
+		var fakePublishRepository = Substitute.For<IGameBetWorkerPublishRepository>();
 
 		var externalRoundId = Guid.NewGuid().ToString();
 		var externalBetId = Guid.NewGuid().ToString();
@@ -22,7 +22,7 @@ public class GameBetWorkerCommandServiceUnitTest
 		var externalClosedOn = DateTimeOffset.UtcNow.AddSeconds(-5);
 		var externalPayoffOn = DateTimeOffset.UtcNow;
 
-		var command = new GameBetWorkerCommand(
+		var command = new GameBetWorkerResponse(
 			GameBetId: Guid.NewGuid(),
 			GameProviderId: Guid.NewGuid(),
 			GameProviderConfigurationId: Guid.NewGuid(),
@@ -98,17 +98,20 @@ public class GameBetWorkerCommandServiceUnitTest
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(GameBets.Common.Enums.GameBetCommandResult.Add);
 
-		var sut = new GameBetWorkerCommandService(
+		var sut = new GameBetWorkerService(
 			fakeLog,
 			fakeRepository,
-			fakeGameBetWorkerPublishService);
+			fakePublishRepository);
 
-		await sut.ExecuteAsync(command);
+		var cancellationTokenSource = new CancellationTokenSource();
+		var token = cancellationTokenSource.Token;
 
-		_ = fakeGameBetWorkerPublishService
+		await sut.Handle(command, token);
+
+		_ = fakePublishRepository
 			.Received(1)
-			.ExecuteAsync(
-			command: Arg.Is(new GameBetWorkerPublishCommand(
+			.PublishAsync(
+			source: Arg.Is(new GameBetWorkerPublish(
 				GameProviderId: command.GameProviderId,
 				GameId: command.GameId,
 				PlayerCode: command.PlayerCode,

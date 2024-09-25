@@ -16,7 +16,7 @@ internal class GameBetsWorkerDispatcher(IServiceProvider serviceProvider) : IGam
 		Dispose(false);
 	}
 
-	public async ValueTask PushCommandAsync(GameBetWorkerCommand command, CancellationToken cancellationToken = default)
+	public async ValueTask PushCommandAsync(GameBetWorkerResponse command, CancellationToken cancellationToken = default)
 	{
 		var key = GetKey(command.BrandId, command.GameProviderId, command.GameId);
 		using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cancellationTokenSource.Token);

@@ -31,7 +31,7 @@ internal class GameBetsWorkerMessageHandler(
 			}));
 
 		return dispatcher.PushCommandAsync(
-			command: new GameBetWorkerCommand(
+			command: new GameBetWorkerResponse(
 				GameBetId: data.GameBetId.ToGuid(),
 				GameProviderId: data.GameProviderId.ToGuid(),
 				GameProviderConfigurationId: data.GameProviderConfigurationId.ToGuid(),

@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Nodes;
 
-namespace Tgs.GameBets.Worker.Core.ApplicationServices;
-public record GameBetWorkerCommand(
+namespace Tgs.GameBets.Worker.Core.Models;
+public record GameBetCloseCommand(
 	Guid GameBetId,
 	Guid GameProviderId,
 	Guid GameProviderConfigurationId,
@@ -29,8 +29,12 @@ public record GameBetWorkerCommand(
 	decimal Bet,
 	decimal ValidBet,
 	decimal Settle,
-	decimal Commission,
-	decimal Turnover,
 	decimal WinLoss,
+	decimal Turnover,
+	decimal Commission,
+	decimal Contribute,
 	decimal Jackpot,
-	JsonNode AdditionalData);
+	DateTimeOffset CreatedOn,
+	DateTimeOffset ClosedOn,
+	JsonNode AdditionalData,
+	JsonNode ExtendedData);

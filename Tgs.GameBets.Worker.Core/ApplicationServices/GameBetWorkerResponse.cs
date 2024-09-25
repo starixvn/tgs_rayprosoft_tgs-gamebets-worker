@@ -1,0 +1,37 @@
+﻿using System.Text.Json.Nodes;
+using MediatR;
+
+namespace Tgs.GameBets.Worker.Core.ApplicationServices;
+public record GameBetWorkerResponse(
+	Guid GameBetId,
+	Guid GameProviderId,
+	Guid GameProviderConfigurationId,
+	int GameId,
+	Guid ResellerId,
+	Guid LicenseeId,
+	Guid BrandId,
+	string PlayerCode,
+	string CurrencyCode,
+	Guid WalletId,
+	string ExternalRoundId,
+	string ExternalBetId,
+	DateTimeOffset ExternalCreatedOn,
+	DateTimeOffset ExternalClosedOn,
+	DateTimeOffset ExternalPayoffOn,
+	DateTimeOffset ExternalResettleOn,
+	GameBets.Common.Enums.BetState BetState,
+	GameBets.Common.Enums.BetType BetType,
+	GameBets.Common.Enums.FreeGameState FreeGameState,
+	GameBets.Common.Enums.GambleState GambleState,
+	GameBets.Common.Enums.CashoutState CashoutState,
+	GameBets.Common.Enums.ResettleState ResettleState,
+	GameBets.Common.Enums.JackpotState JackpotState,
+	decimal CurrencyRatio,
+	decimal Bet,
+	decimal ValidBet,
+	decimal Settle,
+	decimal Commission,
+	decimal Turnover,
+	decimal WinLoss,
+	decimal Jackpot,
+	JsonNode AdditionalData) : IRequest;

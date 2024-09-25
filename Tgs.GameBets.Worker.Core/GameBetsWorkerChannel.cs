@@ -17,7 +17,7 @@ internal class GameBetsWorkerChannel(
 {
 	private static readonly ActivitySource _ActivitySource = new(name: typeof(GameBetsWorkerChannel).FullName!);
 
-	private readonly Channel<GameBetWorkerCommand> _channel = Channel.CreateUnbounded<GameBetWorkerCommand>(
+	private readonly Channel<GameBetWorkerResponse> _channel = Channel.CreateUnbounded<GameBetWorkerResponse>(
 		new UnboundedChannelOptions
 		{
 			SingleReader = true
@@ -73,7 +73,7 @@ internal class GameBetsWorkerChannel(
 		}
 	}
 
-	public async ValueTask PushCommandAsync(GameBetWorkerCommand command, CancellationToken cancellationToken = default)
+	public async ValueTask PushCommandAsync(GameBetWorkerResponse command, CancellationToken cancellationToken = default)
 	{
 		using var cts = CancellationTokenSource.CreateLinkedTokenSource(
 			token1: cancellationToken,
@@ -158,7 +158,7 @@ internal class GameBetsWorkerChannel(
 							Message = "This processing."
 						}));
 					using var scope = serviceProvider.CreateScope();
-					var service = scope.ServiceProvider.GetRequiredService<ICommandService<GameBetWorkerCommand>>();
+					var service = scope.ServiceProvider.GetRequiredService<ICommandService<GameBetWorkerResponse>>();
 					await service.ExecuteAsync(
 						command: command,
 						cancellationToken: cancellationToken)

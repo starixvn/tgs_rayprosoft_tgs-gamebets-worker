@@ -1,5 +1,5 @@
-﻿namespace Tgs.GameBets.Worker.Core.ApplicationServices;
-public record GameBetWorkerPublishCommand(
+﻿namespace Tgs.GameBets.Worker.Core.Models;
+public record GameBetWorkerPublish(
 	Guid GameProviderId,
 	int GameId,
 	string PlayerCode,

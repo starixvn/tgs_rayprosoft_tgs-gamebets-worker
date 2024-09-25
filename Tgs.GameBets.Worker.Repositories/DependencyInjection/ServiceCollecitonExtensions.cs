@@ -8,5 +8,8 @@ public static class ServiceCollecitonExtensions
 	public static IServiceCollection AddGameBetsWorkerRepositories(
 		this IServiceCollection services)
 		=> services
-		.AddTransient<IGameBetRepository, GameBetRepository>();
+		.AddTransient<IGameBetRepository, GameBetRepository>()
+		.AddTransient<IGameBetClosesRepository, GameBetClosesRepository>()
+		.AddTransient<IGameBetRunningRepository, GameBetRunningRepository>()
+		.AddTransient<IGameBetWorkerPublishRepository, GameBetWorkerPublishRepository>();
 }
