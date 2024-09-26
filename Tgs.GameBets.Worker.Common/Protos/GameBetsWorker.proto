@@ -46,14 +46,7 @@ message GameBetsWorkerRequest {
 	phoenix.protobuf.DecimalValue jackpot = 31;
 	google.protobuf.Timestamp created_on = 32;
 	google.protobuf.Timestamp closed_on = 33;
-	google.protobuf.Timestamp updated_on = 34;
-	string additional_data = 35;
-}
-
-message GameBetsWorkerExpiryRequest {
-	phoenix.protobuf.GuidValue game_provider_id = 1;
-	int32 game_id = 2;
-	phoenix.protobuf.GuidValue brand_id = 3;
+	string additional_data = 34;
 }
 
 message GameBetCloseWorkerRequest {
@@ -95,12 +88,6 @@ message GameBetCloseWorkerRequest {
 	string extended_data = 36;
 }
 
-message GameBetCloseWorkerExpiryRequest {
-	phoenix.protobuf.GuidValue game_provider_id = 1;
-	int32 game_id = 2;
-	phoenix.protobuf.GuidValue brand_id = 3;
-}
-
 message GameBetRunningWorkerRequest {
     phoenix.protobuf.GuidValue game_bet_id = 1;
 	phoenix.protobuf.GuidValue game_provider_id = 2;
@@ -125,12 +112,11 @@ message GameBetRunningWorkerRequest {
 	string extended_data = 21;
 }
 
-message GameBetRunningWorkerExpiryRequest {
+message GameBetsWorkerExpiryRequest {
 	phoenix.protobuf.GuidValue game_provider_id = 1;
 	int32 game_id = 2;
 	phoenix.protobuf.GuidValue brand_id = 3;
 }
-
 
 message GameBetsWorkerPublish {
     phoenix.protobuf.GuidValue game_bet_id = 1;

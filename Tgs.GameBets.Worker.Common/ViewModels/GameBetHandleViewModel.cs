@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 
 namespace Tgs.GameBets.Worker.Common.ViewModels;
 
-public record GameBetCloseHandleViewModel
+public record GameBetHandleViewModel
 {
 	[Required]
 	[DefaultValue(typeof(Guid), "0191e3f1-e185-0000-0001-07e8778bb552")]
