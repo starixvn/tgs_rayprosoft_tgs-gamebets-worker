@@ -9,5 +9,7 @@ public static class ServiceCollecitonExtensions
 		this IServiceCollection services)
 		=> services
 		.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
-		.AddSingleton<IGameBetsWorkerDispatcher, GameBetsWorkerDispatcher>();
+		.AddSingleton<IGameBetsWorkerDispatcher, GameBetsWorkerDispatcher>()
+		.AddSingleton<IGameBetCloseWorkerDispatcher, GameBetCloseWorkerDispatcher>()
+		.AddSingleton<IGameBetRunningWorkerDispatcher, GameBetRunningWorkerDispatcher>();
 }

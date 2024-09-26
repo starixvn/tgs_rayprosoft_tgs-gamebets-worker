@@ -7,12 +7,14 @@ using Tgs.GameBets.Worker.Core;
 using Tgs.GameBets.Worker.Core.Models;
 
 namespace Tgs.GameBets.Worker.Repositories;
+
 internal class GameBetRunningRepository(
 	ILogger<GameBetRepository> logger,
 	IOptions<PolicySettingsOptions> options,
 	IGameBetsClient client) : IGameBetRunningRepository
 {
 	private readonly PolicySettingsOptions _policySettingsOptions = options.Value;
+
 	public async ValueTask CommandAsync(GameBetRunningCommand source, CancellationToken cancellationToken = default)
 	{
 		var gameBetRunningCommand = new GameBetRunningCommandViewModel
@@ -70,6 +72,7 @@ internal class GameBetRunningRepository(
 		   cancellationToken: cancellationToken).AsTask())
 		   .ConfigureAwait(false);
 	}
+
 	public async ValueTask DeleteAsync(Guid gameBetId, CancellationToken cancellationToken = default)
 	{
 		var retryCount = _policySettingsOptions.RetryCount;
@@ -87,7 +90,7 @@ internal class GameBetRunningRepository(
 						RetryCount = retryCount,
 						Data = new
 						{
-							GameBetId=gameBetId
+							GameBetId = gameBetId
 						},
 						exception.Message
 					}));

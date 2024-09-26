@@ -2,7 +2,7 @@
 using MediatR;
 
 namespace Tgs.GameBets.Worker.Core.ApplicationServices;
-public record GameBetWorkerResponse(
+public record GameBetWorkerRequest(
 	Guid GameBetId,
 	Guid GameProviderId,
 	Guid GameProviderConfigurationId,

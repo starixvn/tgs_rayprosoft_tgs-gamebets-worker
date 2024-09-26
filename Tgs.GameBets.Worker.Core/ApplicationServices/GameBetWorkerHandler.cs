@@ -5,12 +5,12 @@ using Tgs.GameBets.Worker.Core.Models;
 
 namespace Tgs.GameBets.Worker.Core.ApplicationServices;
 
-internal class GameBetWorkerService(
-	ILogger<GameBetWorkerService> logger,
+internal class GameBetWorkerHandler(
+	ILogger<GameBetWorkerHandler> logger,
 	IGameBetRepository repository,
-	IGameBetWorkerPublishRepository publishRepository) : IRequestHandler<GameBetWorkerResponse>
+	IGameBetWorkerPublishRepository publishRepository) : IRequestHandler<GameBetWorkerRequest>
 {
-	public async Task Handle(GameBetWorkerResponse request, CancellationToken cancellationToken)
+	public async Task Handle(GameBetWorkerRequest request, CancellationToken cancellationToken)
 	{
 		if (request.BetState is GameBets.Common.Enums.BetState.Waiting or GameBets.Common.Enums.BetState.Running)
 		{

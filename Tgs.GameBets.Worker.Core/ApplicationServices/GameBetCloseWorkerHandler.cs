@@ -5,11 +5,11 @@ using Tgs.GameBets.Worker.Core.Models;
 
 namespace Tgs.GameBets.Worker.Core.ApplicationServices;
 
-internal class GameBetCloseWorkerService(
-	ILogger<GameBetCloseWorkerService> logger,
-	IGameBetClosesRepository repository) : IRequestHandler<GameBetCloseWorkerResponse>
+internal class GameBetCloseWorkerHandler(
+	ILogger<GameBetCloseWorkerHandler> logger,
+	IGameBetClosesRepository repository) : IRequestHandler<GameBetCloseWorkerRequest>
 {
-	public async Task Handle(GameBetCloseWorkerResponse request, CancellationToken cancellationToken)
+	public async Task Handle(GameBetCloseWorkerRequest request, CancellationToken cancellationToken)
 	{
 		if (request.BetState is GameBets.Common.Enums.BetState.Waiting or GameBets.Common.Enums.BetState.Running)
 		{

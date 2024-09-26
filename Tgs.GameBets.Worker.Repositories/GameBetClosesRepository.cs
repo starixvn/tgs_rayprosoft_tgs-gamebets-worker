@@ -8,6 +8,7 @@ using Tgs.GameBets.Worker.Core;
 using Tgs.GameBets.Worker.Core.Models;
 
 namespace Tgs.GameBets.Worker.Repositories;
+
 internal class GameBetClosesRepository(
 	ILogger<GameBetRepository> logger,
 	IOptions<PolicySettingsOptions> options,

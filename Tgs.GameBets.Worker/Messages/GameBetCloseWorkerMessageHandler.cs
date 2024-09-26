@@ -6,11 +6,11 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.GameBets.Worker.Messages;
 
-internal class GameBetsWorkerMessageHandler(
-	ILogger<GameBetsWorkerMessageHandler> logger,
-	IGameBetsWorkerDispatcher dispatcher) : IMessageHandler<Common.Protos.GameBetsWorkerRequest>
+internal class GameBetCloseWorkerMessageHandler(
+	ILogger<GameBetCloseWorkerMessageHandler> logger,
+	IGameBetCloseWorkerDispatcher dispatcher) : IMessageHandler<Common.Protos.GameBetCloseWorkerRequest>
 {
-	public ValueTask HandleAsync(string subject, Common.Protos.GameBetsWorkerRequest data, IEnumerable<MessageHeaderValue>? headerValues, CancellationToken cancellationToken = default)
+	public ValueTask HandleAsync(string subject, Common.Protos.GameBetCloseWorkerRequest data, IEnumerable<MessageHeaderValue>? headerValues, CancellationToken cancellationToken = default)
 	{
 		logger.LogInformation("{logInformation}",
 			JsonSerializer.Serialize(new
@@ -31,7 +31,7 @@ internal class GameBetsWorkerMessageHandler(
 			}));
 
 		return dispatcher.PushCommandAsync(
-			command: new GameBetWorkerResponse(
+			request: new GameBetCloseWorkerRequest(
 				GameBetId: data.GameBetId.ToGuid(),
 				GameProviderId: data.GameProviderId.ToGuid(),
 				GameProviderConfigurationId: data.GameProviderConfigurationId.ToGuid(),
@@ -59,11 +59,15 @@ internal class GameBetsWorkerMessageHandler(
 				Bet: data.Bet.ToDecimal().GetValueOrDefault(0.0m),
 				ValidBet: data.ValidBet.ToDecimal().GetValueOrDefault(0.0m),
 				Settle: data.Settle.ToDecimal().GetValueOrDefault(0.0m),
-				Commission: data.Commission.ToDecimal().GetValueOrDefault(0.0m),
-				Turnover: data.Turnover.ToDecimal().GetValueOrDefault(0.0m),
 				WinLoss: data.WinLoss.ToDecimal().GetValueOrDefault(0.0m),
+				Turnover: data.Turnover.ToDecimal().GetValueOrDefault(0.0m),
+				Commission: data.Commission.ToDecimal().GetValueOrDefault(0.0m),
+				Contribute: data.Contribute.ToDecimal().GetValueOrDefault(0.0m),
 				Jackpot: data.Jackpot.ToDecimal().GetValueOrDefault(0.0m),
-				AdditionalData: JsonNode.Parse(data.AdditionalData)!),
+				CreatedOn: data.CreatedOn.ToDateTimeOffset(),
+				ClosedOn: data.ClosedOn.ToDateTimeOffset(),
+				AdditionalData: JsonNode.Parse(data.AdditionalData) ?? new JsonObject { },
+				ExtendedData: JsonNode.Parse(data.ExtendedData) ?? new JsonObject { }),
 			cancellationToken: cancellationToken);
 	}
 }

@@ -8,7 +8,7 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.GameBets.Worker.Repositories;
 
-class GameBetWorkerPublishRepository(
+internal class GameBetWorkerPublishRepository(
 	ILogger<GameBetWorkerPublishRepository> logger,
 	IGameBetsClient client,
 	IMessageSender messageSender) : IGameBetWorkerPublishRepository

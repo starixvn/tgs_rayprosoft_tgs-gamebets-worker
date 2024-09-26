@@ -60,7 +60,7 @@ public class WorkerController : ControllerBase
 	{
 		var tasks = new Task[]{
 			Task.Run( ()=>messageSender.PublishAsync(
-				subject: GameBetsWorkerNatsConst.GameBetsWorkerRequest,
+				subject: GameBetsWorkerNatsConst.GameBetWorkerRequest,
 				data: new Common.Protos.GameBetsWorkerRequest
 				{
 					GameBetId = source.GameBetId,
@@ -98,7 +98,7 @@ public class WorkerController : ControllerBase
 				},
 				cancellationToken: HttpContext.RequestAborted).AsTask()),
 			Task.Run( ()=>messageSender.PublishAsync(
-				subject: GameBetsWorkerNatsConst.GameBetsWorkerExpiryRequest,
+				subject: GameBetsWorkerNatsConst.GameBetWorkerExpiryRequest,
 				data: new Common.Protos.GameBetsWorkerExpiryRequest
 				{
 					GameProviderId = source.GameProviderId,

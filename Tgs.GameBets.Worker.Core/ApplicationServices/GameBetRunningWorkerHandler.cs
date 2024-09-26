@@ -1,15 +1,14 @@
-﻿using System.Text.Json;
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using Tgs.GameBets.Worker.Core.Models;
 
 namespace Tgs.GameBets.Worker.Core.ApplicationServices;
 
-internal class GameBetRunningWorkerService(
-	ILogger<GameBetRunningWorkerService> logger,
-	IGameBetRunningRepository repository) : IRequestHandler<GameBetRunningWorkerResponse>
+internal class GameBetRunningWorkerHandler(
+	ILogger<GameBetRunningWorkerHandler> logger,
+	IGameBetRunningRepository repository) : IRequestHandler<GameBetRunningWorkerRequest>
 {
-	public Task Handle(GameBetRunningWorkerResponse request, CancellationToken cancellationToken)
+	public Task Handle(GameBetRunningWorkerRequest request, CancellationToken cancellationToken)
 	{
 		return request.BetState is GameBets.Common.Enums.BetState.Waiting or GameBets.Common.Enums.BetState.Running
 			? repository.CommandAsync(
