@@ -6,9 +6,9 @@ namespace Tgs.GameBets.Worker.Messages;
 
 internal class GameBetRunningWorkerExpiryMessageHandler(
 	ILogger<GameBetRunningWorkerExpiryMessageHandler> logger,
-	IGameBetRunningWorkerDispatcher dispatcher) : IMessageHandler<Common.Protos.GameBetRunningWorkerExpiryRequest>
+	IGameBetRunningWorkerDispatcher dispatcher) : IMessageHandler<Common.Protos.GameBetsWorkerExpiryRequest>
 {
-	public ValueTask HandleAsync(string subject, Common.Protos.GameBetRunningWorkerExpiryRequest data, IEnumerable<MessageHeaderValue>? headerValues, CancellationToken cancellationToken = default)
+	public ValueTask HandleAsync(string subject, Common.Protos.GameBetsWorkerExpiryRequest data, IEnumerable<MessageHeaderValue>? headerValues, CancellationToken cancellationToken = default)
 	{
 		logger.LogInformation("{logInformation}",
 			JsonSerializer.Serialize(new

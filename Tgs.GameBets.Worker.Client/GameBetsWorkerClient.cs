@@ -16,12 +16,12 @@ internal class GameBetsWorkerClient(
 		Converters = { new JsonStringEnumConverter() }
 	};
 
-	public async ValueTask CloseHandleAsync(GameBetCloseHandleViewModel source, CancellationToken cancellationToken = default)
+	public async ValueTask HandleAsync(GameBetHandleViewModel source, CancellationToken cancellationToken = default)
 	{
 		var requestContent = JsonContent.Create(source, options: _SerializerOptions);
 
 		var httpResponseMessage = await httpClient.PostAsync(
-			"/handles/close",
+			"/handles",
 			requestContent,
 			cancellationToken)
 			.ConfigureAwait(false);
@@ -35,19 +35,6 @@ internal class GameBetsWorkerClient(
 
 		var httpResponseMessage = await httpClient.PostAsync(
 			"/worker",
-			requestContent,
-			cancellationToken)
-			.ConfigureAwait(false);
-
-		_ = httpResponseMessage.EnsureSuccessStatusCode();
-	}
-
-	public async ValueTask RunningHandleAsync(GameBetRunningHandleViewModel source, CancellationToken cancellationToken = default)
-	{
-		var requestContent = JsonContent.Create(source, options: _SerializerOptions);
-
-		var httpResponseMessage = await httpClient.PostAsync(
-			"/handles/running",
 			requestContent,
 			cancellationToken)
 			.ConfigureAwait(false);
