@@ -4,8 +4,8 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.GameBets.Worker.Messages;
 
-internal class GameBetsWorkerExpiryMessageHandler(
-	ILogger<GameBetsWorkerExpiryMessageHandler> logger,
+internal class GameBetWorkerExpiryMessageHandler(
+	ILogger<GameBetWorkerExpiryMessageHandler> logger,
 	IGameBetsWorkerDispatcher dispatcher) : IMessageHandler<Common.Protos.GameBetsWorkerExpiryRequest>
 {
 	public ValueTask HandleAsync(string subject, Common.Protos.GameBetsWorkerExpiryRequest data, IEnumerable<MessageHeaderValue>? headerValues, CancellationToken cancellationToken = default)

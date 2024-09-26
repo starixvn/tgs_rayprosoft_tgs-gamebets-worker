@@ -1,20 +1,21 @@
 ﻿using System.Text.Json;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
-using Tgs.ServiceUtility;
+using Tgs.GameBets.Client;
+using Tgs.GameBets.Worker.Core;
+using Tgs.GameBets.Worker.Core.Models;
 using Valhalla.MessageQueue;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Tgs.GameBets.Worker.Core.ApplicationServices;
+namespace Tgs.GameBets.Worker.Repositories;
 
-internal class GameBetWorkerPublishCommandService(
-	ILogger<GameBetWorkerPublishCommandService> logger,
-	IGameBetRepository gameBetRepository,
-	IMessageSender messageSender) : ICommandService<GameBetWorkerPublishCommand>
+internal class GameBetWorkerPublishRepository(
+	ILogger<GameBetWorkerPublishRepository> logger,
+	IGameBetsClient client,
+	IMessageSender messageSender) : IGameBetWorkerPublishRepository
 {
-	public async ValueTask ExecuteAsync(GameBetWorkerPublishCommand command, CancellationToken cancellationToken = default)
+	public async ValueTask PublishAsync(GameBetWorkerPublish source, CancellationToken cancellationToken = default)
 	{
-		if (command.Result == GameBets.Common.Enums.GameBetCommandResult.Running)
+		if (source.Result == GameBets.Common.Enums.GameBetCommandResult.Running)
 		{
 			logger.LogWarning("{logWarning}",
 				JsonSerializer.Serialize(new
@@ -22,13 +23,13 @@ internal class GameBetWorkerPublishCommandService(
 					LogOn = DateTime.Now.ToString("u"),
 					Data = new
 					{
-						command.GameProviderId,
-						command.GameId,
-						command.PlayerCode,
-						command.WalletId,
-						command.ExternalBetId,
-						ExternalCreatedOn = command.ExternalCreatedOn.ToString("u"),
-						command.Result
+						source.GameProviderId,
+						source.GameId,
+						source.PlayerCode,
+						source.WalletId,
+						source.ExternalBetId,
+						ExternalCreatedOn = source.ExternalCreatedOn.ToString("u"),
+						source.Result
 					},
 					Message = "The bet status of this game is not settled."
 				}));
@@ -36,23 +37,23 @@ internal class GameBetWorkerPublishCommandService(
 			return;
 		}
 
-		var model = await gameBetRepository.GetAsync(
-			gameProviderId: command.GameProviderId,
-			gameId: command.GameId,
-			walletId: command.WalletId,
-			externalBetId: command.ExternalBetId,
-			externalCreatedOn: command.ExternalCreatedOn,
+		var model = await client.GameBetMajorGetAsync(
+			gameProviderId: source.GameProviderId,
+			gameId: source.GameId,
+			walletId: source.WalletId,
+			externalBetId: source.ExternalBetId,
+			externalCreatedOn: source.ExternalCreatedOn,
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false)
 			?? throw new ArgumentNullException(
 				new
 				{
-					command.GameProviderId,
-					command.GameId,
-					command.PlayerCode,
-					command.WalletId,
-					command.ExternalBetId,
-					command.ExternalCreatedOn
+					source.GameProviderId,
+					source.GameId,
+					source.PlayerCode,
+					source.WalletId,
+					source.ExternalBetId,
+					source.ExternalCreatedOn
 				}.ToString(),
 				"This game bet does not exist.");
 
@@ -123,7 +124,7 @@ internal class GameBetWorkerPublishCommandService(
 				Message = "This game bet is published."
 			}));
 
-		if (command.Result == GameBets.Common.Enums.GameBetCommandResult.Add)
+		if (source.Result == GameBets.Common.Enums.GameBetCommandResult.Add)
 		{
 			await messageSender.PublishAsync(
 				subject: Common.GameBetsWorkerNatsConst.GameBetsWorkerAddPublish,
@@ -155,7 +156,7 @@ internal class GameBetWorkerPublishCommandService(
 				}));
 		}
 
-		if (command.Result == GameBets.Common.Enums.GameBetCommandResult.Update)
+		if (source.Result == GameBets.Common.Enums.GameBetCommandResult.Update)
 		{
 			await messageSender.PublishAsync(
 				subject: Common.GameBetsWorkerNatsConst.GameBetsWorkerUpdatePublish,

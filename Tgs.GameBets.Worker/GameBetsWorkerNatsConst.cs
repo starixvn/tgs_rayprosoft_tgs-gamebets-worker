@@ -2,6 +2,10 @@
 
 public record GameBetsWorkerNatsConst
 {
-	public const string GameBetsWorkerRequest = "game.gamebet.worker.request";
-	public const string GameBetsWorkerExpiryRequest = "game.gamebet.worker.expiry.request";
+	public const string GameBetWorkerRequest = "game.gamebet.worker.request";
+	public const string GameBetWorkerExpiryRequest = "game.gamebet.worker.expiry.request";
+	public const string GameBetCloseWorkerRequest = "game.gamebet.close.worker.request";
+	public const string GameBetCloseWorkerExpiryRequest = "game.gamebet.close.worker.expiry.request";
+	public const string GameBetRunningWorkerRequest = "game.gamebet.running.worker.request";
+	public const string GameBetRunningWorkerExpiryRequest = "game.gamebet.running.worker.expiry.request";
 }

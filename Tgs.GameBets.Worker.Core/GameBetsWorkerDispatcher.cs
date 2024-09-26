@@ -16,9 +16,9 @@ internal class GameBetsWorkerDispatcher(IServiceProvider serviceProvider) : IGam
 		Dispose(false);
 	}
 
-	public async ValueTask PushCommandAsync(GameBetWorkerCommand command, CancellationToken cancellationToken = default)
+	public async ValueTask PushCommandAsync(GameBetWorkerRequest request, CancellationToken cancellationToken = default)
 	{
-		var key = GetKey(command.BrandId, command.GameProviderId, command.GameId);
+		var key = GetKey(request.BrandId, request.GameProviderId, request.GameId);
 		using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cancellationTokenSource.Token);
 		var counter = _counters.GetOrAdd(
 			key,
@@ -39,7 +39,7 @@ internal class GameBetsWorkerDispatcher(IServiceProvider serviceProvider) : IGam
 			});
 
 		await counter.PrepareAsync(cts.Token).ConfigureAwait(false);
-		await counter.PushCommandAsync(command, cts.Token).ConfigureAwait(false);
+		await counter.PushCommandAsync(request, cts.Token).ConfigureAwait(false);
 	}
 
 	public ValueTask DisposeAsync()
@@ -79,5 +79,5 @@ internal class GameBetsWorkerDispatcher(IServiceProvider serviceProvider) : IGam
 	}
 
 	private static string GetKey(Guid brandId, Guid gameProviderId, int gameId)
-		=> string.Concat("BrandId", ":", brandId, ":", "GameProviderId", ":", gameProviderId, ":", "GameId", ":", gameId);
+		=> string.Concat("BrandId", "=", brandId, ":", "GameProviderId", "=", gameProviderId, ":", "GameId", "=", gameId);
 }

@@ -5,6 +5,4 @@ namespace Tgs.GameBets.Worker.Core;
 public interface IGameBetRepository
 {
 	ValueTask<GameBets.Common.Enums.GameBetCommandResult> CommandAsync(GameBetCommandModel source, CancellationToken cancellationToken = default);
-
-	ValueTask<GameBetInfoModel?> GetAsync(Guid gameProviderId, int gameId, Guid walletId, string externalBetId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default);
 }

@@ -1,7 +1,8 @@
 ﻿using System.Text.Json.Nodes;
+using MediatR;
 
 namespace Tgs.GameBets.Worker.Core.ApplicationServices;
-public record GameBetWorkerCommand(
+public record GameBetWorkerRequest(
 	Guid GameBetId,
 	Guid GameProviderId,
 	Guid GameProviderConfigurationId,
@@ -33,4 +34,4 @@ public record GameBetWorkerCommand(
 	decimal Turnover,
 	decimal WinLoss,
 	decimal Jackpot,
-	JsonNode AdditionalData);
+	JsonNode AdditionalData) : IRequest;

@@ -8,6 +8,8 @@ public static class ServiceCollecitonExtensions
 	public static IServiceCollection AddGameBetsWorkerCore(
 		this IServiceCollection services)
 		=> services
-		.RegisterAllServiceUtilityTypes(Assembly.GetExecutingAssembly(), ServiceLifetime.Transient)
-		.AddSingleton<IGameBetsWorkerDispatcher, GameBetsWorkerDispatcher>();
+		.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
+		.AddSingleton<IGameBetsWorkerDispatcher, GameBetsWorkerDispatcher>()
+		.AddSingleton<IGameBetCloseWorkerDispatcher, GameBetCloseWorkerDispatcher>()
+		.AddSingleton<IGameBetRunningWorkerDispatcher, GameBetRunningWorkerDispatcher>();
 }

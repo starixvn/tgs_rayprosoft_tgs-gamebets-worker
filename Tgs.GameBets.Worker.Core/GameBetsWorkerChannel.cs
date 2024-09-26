@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
 using System.Threading.Channels;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Tgs.GameBets.Worker.Core.ApplicationServices;
-using Tgs.ServiceUtility;
 
 namespace Tgs.GameBets.Worker.Core;
 
@@ -17,7 +17,7 @@ internal class GameBetsWorkerChannel(
 {
 	private static readonly ActivitySource _ActivitySource = new(name: typeof(GameBetsWorkerChannel).FullName!);
 
-	private readonly Channel<GameBetWorkerCommand> _channel = Channel.CreateUnbounded<GameBetWorkerCommand>(
+	private readonly Channel<GameBetWorkerRequest> _channel = Channel.CreateUnbounded<GameBetWorkerRequest>(
 		new UnboundedChannelOptions
 		{
 			SingleReader = true
@@ -73,14 +73,14 @@ internal class GameBetsWorkerChannel(
 		}
 	}
 
-	public async ValueTask PushCommandAsync(GameBetWorkerCommand command, CancellationToken cancellationToken = default)
+	public async ValueTask PushCommandAsync(GameBetWorkerRequest request, CancellationToken cancellationToken = default)
 	{
 		using var cts = CancellationTokenSource.CreateLinkedTokenSource(
 			token1: cancellationToken,
 			token2: _cancellationTokenSource.Token);
 
 		await _channel.Writer.WriteAsync(
-			item: command,
+			item: request,
 			cancellationToken: cts.Token).ConfigureAwait(false);
 	}
 
@@ -132,7 +132,7 @@ internal class GameBetsWorkerChannel(
 			.WaitToReadAsync(cancellationToken)
 			.ConfigureAwait(false))
 		{
-			if (reader.TryRead(out var command))
+			if (reader.TryRead(out var request))
 			{
 				using var activity = _ActivitySource.StartActivity(
 					"GameBetsWorkerChannel handle exchange",
@@ -147,20 +147,20 @@ internal class GameBetsWorkerChannel(
 							Key,
 							Data = new
 							{
-								command.GameProviderId,
-								command.GameId,
-								command.PlayerCode,
-								command.WalletId,
-								command.ExternalRoundId,
-								command.ExternalBetId,
-								ExternalCreatedOn = command.ExternalCreatedOn.ToString("u")
+								request.GameProviderId,
+								request.GameId,
+								request.PlayerCode,
+								request.WalletId,
+								request.ExternalRoundId,
+								request.ExternalBetId,
+								ExternalCreatedOn = request.ExternalCreatedOn.ToString("u")
 							},
 							Message = "This processing."
 						}));
 					using var scope = serviceProvider.CreateScope();
-					var service = scope.ServiceProvider.GetRequiredService<ICommandService<GameBetWorkerCommand>>();
-					await service.ExecuteAsync(
-						command: command,
+					var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+					await mediator.Send(
+						request: request,
 						cancellationToken: cancellationToken)
 						.ConfigureAwait(false);
 				}
@@ -173,13 +173,13 @@ internal class GameBetsWorkerChannel(
 							Key,
 							Data = new
 							{
-								command.GameProviderId,
-								command.GameId,
-								command.PlayerCode,
-								command.WalletId,
-								command.ExternalRoundId,
-								command.ExternalBetId,
-								ExternalCreatedOn = command.ExternalCreatedOn.ToString("u")
+								request.GameProviderId,
+								request.GameId,
+								request.PlayerCode,
+								request.WalletId,
+								request.ExternalRoundId,
+								request.ExternalBetId,
+								ExternalCreatedOn = request.ExternalCreatedOn.ToString("u")
 							},
 							Message = "This exception occurs."
 						}));

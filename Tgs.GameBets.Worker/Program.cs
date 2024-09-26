@@ -70,11 +70,19 @@ builder.Services
 	.AddMessageQueue()
 	.AddNatsMessageQueue(config => config
 	.ConfigureResolveConnection(sp => sp.GetRequiredKeyedService<NatsConnection>("Nats"))
-	.AddHandler<GameBetsWorkerMessageHandler>(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetsWorkerRequest, Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetsWorkerRequest)
-	.AddHandler<GameBetsWorkerExpiryMessageHandler>(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetsWorkerExpiryRequest, string.Concat(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetsWorkerExpiryRequest, ".", Environment.MachineName)))
+	.AddHandler<GameBetWorkerMessageHandler>(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetWorkerRequest, Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetWorkerRequest)
+	.AddHandler<GameBetWorkerExpiryMessageHandler>(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetWorkerExpiryRequest, string.Concat(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetWorkerExpiryRequest, ".", Environment.MachineName))
+	.AddHandler<GameBetCloseWorkerMessageHandler>(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetCloseWorkerRequest, Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetCloseWorkerRequest)
+	.AddHandler<GameBetCloseWorkerExpiryMessageHandler>(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetCloseWorkerExpiryRequest, string.Concat(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetCloseWorkerExpiryRequest, ".", Environment.MachineName))
+	.AddHandler<GameBetRunningWorkerMessageHandler>(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetRunningWorkerRequest, Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetRunningWorkerRequest)
+	.AddHandler<GameBetRunningWorkerExpiryMessageHandler>(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetRunningWorkerExpiryRequest, string.Concat(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetRunningWorkerExpiryRequest, ".", Environment.MachineName)))
 	.ClearAllExchanges()
-	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetsWorkerRequest)
-	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetsWorkerExpiryRequest)
+	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetWorkerRequest)
+	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetWorkerExpiryRequest)
+	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetCloseWorkerRequest)
+	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetCloseWorkerExpiryRequest)
+	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetRunningWorkerRequest)
+	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.GameBetsWorkerNatsConst.GameBetRunningWorkerExpiryRequest)
 	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.Common.GameBetsWorkerNatsConst.GameBetsWorkerPublish)
 	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.Common.GameBetsWorkerNatsConst.GameBetsWorkerAddPublish)
 	.AddNatsGlobPatternExchange(Tgs.GameBets.Worker.Common.GameBetsWorkerNatsConst.GameBetsWorkerUpdatePublish);
@@ -87,6 +95,7 @@ builder.Services
 		.AddSource("Tgs.*")
 		.AddSource("TGS.*")
 		.AddSource("Valhalla.*")
+		.AddSource("MediatR")
 		.AddAspNetCoreInstrumentation(options => options.Filter =
 		httpContext => !httpContext.Request.Path.HasValue
 			|| !httpContext.Request.Path.StartsWithSegments("/swagger")

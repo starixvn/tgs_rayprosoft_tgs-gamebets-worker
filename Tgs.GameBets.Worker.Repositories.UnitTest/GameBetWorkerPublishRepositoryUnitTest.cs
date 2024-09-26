@@ -2,19 +2,20 @@
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
-using Tgs.GameBets.Worker.Core.ApplicationServices;
+using Tgs.GameBets.Client;
+using Tgs.GameBets.Common.ViewModels;
 using Tgs.GameBets.Worker.Core.Models;
 using Valhalla.MessageQueue;
 
-namespace Tgs.GameBets.Worker.Core.UnitTest.ApplicationServices;
+namespace Tgs.GameBets.Worker.Repositories.UnitTest;
 
-public class GameBetWorkerPublishCommandServiceUnitTest
+public class GameBetWorkerPublishRepositoryUnitTest
 {
 	[Fact]
 	public async Task GameBet_Command_Result_Is_Add()
 	{
-		var fakeLog = NullLogger<GameBetWorkerPublishCommandService>.Instance;
-		var fakeRepository = Substitute.For<IGameBetRepository>();
+		var fakeLog = NullLogger<GameBetWorkerPublishRepository>.Instance;
+		var fakeClient = Substitute.For<IGameBetsClient>();
 		var fakeMessageSender = Substitute.For<IMessageSender>();
 
 		var externalRoundId = Guid.NewGuid().ToString();
@@ -23,7 +24,7 @@ public class GameBetWorkerPublishCommandServiceUnitTest
 		var externalClosedOn = DateTimeOffset.UtcNow.AddSeconds(-5);
 		var externalPayoffOn = DateTimeOffset.UtcNow;
 
-		var command = new GameBetWorkerPublishCommand(
+		var source = new GameBetWorkerPublish(
 			GameProviderId: Guid.NewGuid(),
 			GameId: 1,
 			PlayerCode: "test",
@@ -32,7 +33,7 @@ public class GameBetWorkerPublishCommandServiceUnitTest
 			ExternalCreatedOn: externalCreatedOn,
 			Result: GameBets.Common.Enums.GameBetCommandResult.Add);
 
-		var model = new GameBetInfoModel(
+		var model = new GameBetInfoViewModel(
 			Id: Guid.NewGuid(),
 			GameProviderId: Guid.NewGuid(),
 			GameProviderConfigurationId: Guid.NewGuid(),
@@ -57,37 +58,41 @@ public class GameBetWorkerPublishCommandServiceUnitTest
 			ResettleState: GameBets.Common.Enums.ResettleState.None,
 			JackpotState: GameBets.Common.Enums.JackpotState.None,
 			CurrencyRatio: 1,
-			Bet: 100,
-			ValidBet: 50,
+			Bet: 100.0m,
+			ValidBet: 50.0m,
 			Settle: 97.5m,
-			Commission: 0,
-			Turnover: 50,
 			WinLoss: 47.5m,
+			Turnover: 50.0m,
+			Commission: 0.1m,
+			Contribute: 0.01m,
 			Jackpot: 0.0m,
 			CreatedOn: DateTimeOffset.UtcNow.AddMinutes(-5),
 			ClosedOn: DateTimeOffset.UtcNow,
 			UpdatedOn: DateTimeOffset.UtcNow,
+			ResetState: GameBets.Common.Enums.ResetState.None,
+			ResetOn: DateTimeOffset.UnixEpoch,
 			AdditionalData: new JsonObject
 			{
 				["ExternalRoundId"] = externalRoundId,
 				["ExternalBetId"] = externalBetId
-			});
+			},
+			ExtendedData: new JsonObject { });
 
-		_ = fakeRepository.GetAsync(
-			gameProviderId: Arg.Is(command.GameProviderId),
-			gameId: Arg.Is(command.GameId),
-			walletId: Arg.Is(command.WalletId),
-			externalBetId: Arg.Is(command.ExternalBetId),
-			externalCreatedOn: Arg.Is(command.ExternalCreatedOn),
+		_ = fakeClient.GameBetMajorGetAsync(
+			externalCreatedOn: Arg.Is(source.ExternalCreatedOn),
+			gameProviderId: Arg.Is(source.GameProviderId),
+			gameId: Arg.Is(source.GameId),
+			walletId: Arg.Is(source.WalletId),
+			externalBetId: Arg.Is(source.ExternalBetId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(model);
 
-		var sut = new GameBetWorkerPublishCommandService(
+		var sut = new GameBetWorkerPublishRepository(
 			fakeLog,
-			fakeRepository,
+			fakeClient,
 			fakeMessageSender);
 
-		await sut.ExecuteAsync(command);
+		await sut.PublishAsync(source);
 
 		_ = fakeMessageSender
 			.Received(1)
@@ -186,8 +191,8 @@ public class GameBetWorkerPublishCommandServiceUnitTest
 	[Fact]
 	public async Task GameBet_Command_Result_Is_Update()
 	{
-		var fakeLog = NullLogger<GameBetWorkerPublishCommandService>.Instance;
-		var fakeRepository = Substitute.For<IGameBetRepository>();
+		var fakeLog = NullLogger<GameBetWorkerPublishRepository>.Instance;
+		var fakeClient = Substitute.For<IGameBetsClient>();
 		var fakeMessageSender = Substitute.For<IMessageSender>();
 
 		var externalRoundId = Guid.NewGuid().ToString();
@@ -196,7 +201,7 @@ public class GameBetWorkerPublishCommandServiceUnitTest
 		var externalClosedOn = DateTimeOffset.UtcNow.AddSeconds(-5);
 		var externalPayoffOn = DateTimeOffset.UtcNow;
 
-		var command = new GameBetWorkerPublishCommand(
+		var source = new GameBetWorkerPublish(
 			GameProviderId: Guid.NewGuid(),
 			GameId: 1,
 			PlayerCode: "test",
@@ -205,7 +210,7 @@ public class GameBetWorkerPublishCommandServiceUnitTest
 			ExternalCreatedOn: externalCreatedOn,
 			Result: GameBets.Common.Enums.GameBetCommandResult.Update);
 
-		var model = new GameBetInfoModel(
+		var model = new GameBetInfoViewModel(
 			Id: Guid.NewGuid(),
 			GameProviderId: Guid.NewGuid(),
 			GameProviderConfigurationId: Guid.NewGuid(),
@@ -230,37 +235,41 @@ public class GameBetWorkerPublishCommandServiceUnitTest
 			ResettleState: GameBets.Common.Enums.ResettleState.None,
 			JackpotState: GameBets.Common.Enums.JackpotState.None,
 			CurrencyRatio: 1,
-			Bet: 100,
-			ValidBet: 50,
+			Bet: 100.0m,
+			ValidBet: 50.0m,
 			Settle: 97.5m,
-			Commission: 0,
-			Turnover: 50,
 			WinLoss: 47.5m,
+			Turnover: 50.0m,
+			Commission: 0.1m,
+			Contribute: 0.01m,
 			Jackpot: 0.0m,
 			CreatedOn: DateTimeOffset.UtcNow.AddMinutes(-5),
 			ClosedOn: DateTimeOffset.UtcNow,
 			UpdatedOn: DateTimeOffset.UtcNow,
+			ResetState: GameBets.Common.Enums.ResetState.None,
+			ResetOn: DateTimeOffset.UnixEpoch,
 			AdditionalData: new JsonObject
 			{
 				["ExternalRoundId"] = externalRoundId,
 				["ExternalBetId"] = externalBetId
-			});
+			},
+			ExtendedData: new JsonObject { });
 
-		_ = fakeRepository.GetAsync(
-			gameProviderId: Arg.Is(command.GameProviderId),
-			gameId: Arg.Is(command.GameId),
-			walletId: Arg.Is(command.WalletId),
-			externalBetId: Arg.Is(command.ExternalBetId),
-			externalCreatedOn: Arg.Is(command.ExternalCreatedOn),
+		_ = fakeClient.GameBetMajorGetAsync(
+			externalCreatedOn: Arg.Is(source.ExternalCreatedOn),
+			gameProviderId: Arg.Is(source.GameProviderId),
+			gameId: Arg.Is(source.GameId),
+			walletId: Arg.Is(source.WalletId),
+			externalBetId: Arg.Is(source.ExternalBetId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(model);
 
-		var sut = new GameBetWorkerPublishCommandService(
+		var sut = new GameBetWorkerPublishRepository(
 			fakeLog,
-			fakeRepository,
+			fakeClient,
 			fakeMessageSender);
 
-		await sut.ExecuteAsync(command);
+		await sut.PublishAsync(source);
 
 		_ = fakeMessageSender
 			.Received(1)
@@ -359,8 +368,8 @@ public class GameBetWorkerPublishCommandServiceUnitTest
 	[Fact]
 	public async Task GameBet_Command_Result_Is_None()
 	{
-		var fakeLog = NullLogger<GameBetWorkerPublishCommandService>.Instance;
-		var fakeRepository = Substitute.For<IGameBetRepository>();
+		var fakeLog = NullLogger<GameBetWorkerPublishRepository>.Instance;
+		var fakeClient = Substitute.For<IGameBetsClient>();
 		var fakeMessageSender = Substitute.For<IMessageSender>();
 
 		var externalRoundId = Guid.NewGuid().ToString();
@@ -369,7 +378,7 @@ public class GameBetWorkerPublishCommandServiceUnitTest
 		var externalClosedOn = DateTimeOffset.UtcNow.AddSeconds(-5);
 		var externalPayoffOn = DateTimeOffset.UtcNow;
 
-		var command = new GameBetWorkerPublishCommand(
+		var source = new GameBetWorkerPublish(
 			GameProviderId: Guid.NewGuid(),
 			GameId: 1,
 			PlayerCode: "test",
@@ -378,7 +387,7 @@ public class GameBetWorkerPublishCommandServiceUnitTest
 			ExternalCreatedOn: externalCreatedOn,
 			Result: GameBets.Common.Enums.GameBetCommandResult.None);
 
-		var model = new GameBetInfoModel(
+		var model = new GameBetInfoViewModel(
 			Id: Guid.NewGuid(),
 			GameProviderId: Guid.NewGuid(),
 			GameProviderConfigurationId: Guid.NewGuid(),
@@ -403,37 +412,41 @@ public class GameBetWorkerPublishCommandServiceUnitTest
 			ResettleState: GameBets.Common.Enums.ResettleState.None,
 			JackpotState: GameBets.Common.Enums.JackpotState.None,
 			CurrencyRatio: 1,
-			Bet: 100,
-			ValidBet: 50,
+			Bet: 100.0m,
+			ValidBet: 50.0m,
 			Settle: 97.5m,
-			Commission: 0,
-			Turnover: 50,
 			WinLoss: 47.5m,
+			Turnover: 50.0m,
+			Commission: 0.1m,
+			Contribute: 0.01m,
 			Jackpot: 0.0m,
 			CreatedOn: DateTimeOffset.UtcNow.AddMinutes(-5),
 			ClosedOn: DateTimeOffset.UtcNow,
 			UpdatedOn: DateTimeOffset.UtcNow,
+			ResetState: GameBets.Common.Enums.ResetState.None,
+			ResetOn: DateTimeOffset.UnixEpoch,
 			AdditionalData: new JsonObject
 			{
 				["ExternalRoundId"] = externalRoundId,
 				["ExternalBetId"] = externalBetId
-			});
+			},
+			ExtendedData: new JsonObject { });
 
-		_ = fakeRepository.GetAsync(
-			gameProviderId: Arg.Is(command.GameProviderId),
-			gameId: Arg.Is(command.GameId),
-			walletId: Arg.Is(command.WalletId),
-			externalBetId: Arg.Is(command.ExternalBetId),
-			externalCreatedOn: Arg.Is(command.ExternalCreatedOn),
+		_ = fakeClient.GameBetMajorGetAsync(
+			externalCreatedOn: Arg.Is(source.ExternalCreatedOn),
+			gameProviderId: Arg.Is(source.GameProviderId),
+			gameId: Arg.Is(source.GameId),
+			walletId: Arg.Is(source.WalletId),
+			externalBetId: Arg.Is(source.ExternalBetId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(model);
 
-		var sut = new GameBetWorkerPublishCommandService(
+		var sut = new GameBetWorkerPublishRepository(
 			fakeLog,
-			fakeRepository,
+			fakeClient,
 			fakeMessageSender);
 
-		await sut.ExecuteAsync(command);
+		await sut.PublishAsync(source);
 
 		_ = fakeMessageSender
 			.Received(1)
@@ -496,14 +509,14 @@ public class GameBetWorkerPublishCommandServiceUnitTest
 	[Fact]
 	public async Task GameBet_Command_Result_Is_Running()
 	{
-		var fakeLog = NullLogger<GameBetWorkerPublishCommandService>.Instance;
-		var fakeRepository = Substitute.For<IGameBetRepository>();
+		var fakeLog = NullLogger<GameBetWorkerPublishRepository>.Instance;
+		var fakeClient = Substitute.For<IGameBetsClient>();
 		var fakeMessageSender = Substitute.For<IMessageSender>();
 
 		var externalBetId = Guid.NewGuid().ToString();
 		var externalCreatedOn = DateTimeOffset.UtcNow.AddMinutes(-5);
 
-		var command = new GameBetWorkerPublishCommand(
+		var source = new GameBetWorkerPublish(
 			GameProviderId: Guid.NewGuid(),
 			GameId: 1,
 			PlayerCode: "test",
@@ -512,21 +525,21 @@ public class GameBetWorkerPublishCommandServiceUnitTest
 			ExternalCreatedOn: externalCreatedOn,
 			Result: GameBets.Common.Enums.GameBetCommandResult.Running);
 
-		var sut = new GameBetWorkerPublishCommandService(
+		var sut = new GameBetWorkerPublishRepository(
 			fakeLog,
-			fakeRepository,
+			fakeClient,
 			fakeMessageSender);
 
-		await sut.ExecuteAsync(command);
+		await sut.PublishAsync(source);
 
-		_ = fakeRepository
+		_ = fakeClient
 			.Received(0)
-			.GetAsync(
-			gameProviderId: Arg.Is(command.GameProviderId),
-			gameId: Arg.Is(command.GameId),
-			walletId: Arg.Is(command.WalletId),
-			externalBetId: Arg.Is(command.ExternalBetId),
-			externalCreatedOn: Arg.Is(command.ExternalCreatedOn),
+			.GameBetMajorGetAsync(
+			externalCreatedOn: Arg.Is(source.ExternalCreatedOn),
+			gameProviderId: Arg.Is(source.GameProviderId),
+			gameId: Arg.Is(source.GameId),
+			walletId: Arg.Is(source.WalletId),
+			externalBetId: Arg.Is(source.ExternalBetId),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeMessageSender
