@@ -11,7 +11,7 @@ data:
           "Default": "Warning",
           "Tgs.GameBets.Worker.Messages.GameBetCloseWorkerMessageHandler": "Information",
           "Tgs.GameBets.Worker.Messages.GameBetRunningWorkerMessageHandler": "Information",
-          "Tgs.GameBets.Worker.Messages.GameBetsWorkerMessageHandler": "Information"
+          "Tgs.GameBets.Worker.Messages.GameBetWorkerMessageHandler": "Information"
         }
       },
       "GameBetsWorkerStrings": {
