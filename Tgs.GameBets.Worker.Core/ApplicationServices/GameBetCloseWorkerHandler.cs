@@ -7,7 +7,8 @@ namespace Tgs.GameBets.Worker.Core.ApplicationServices;
 
 internal class GameBetCloseWorkerHandler(
 	ILogger<GameBetCloseWorkerHandler> logger,
-	IGameBetClosesRepository repository) : IRequestHandler<GameBetCloseWorkerRequest>
+	IGameBetClosesRepository repository,
+	IGameBetWorkerPublishRepository publishRepository) : IRequestHandler<GameBetCloseWorkerRequest>
 {
 	public async Task Handle(GameBetCloseWorkerRequest request, CancellationToken cancellationToken)
 	{
@@ -33,7 +34,7 @@ internal class GameBetCloseWorkerHandler(
 			return;
 		}
 
-		_ = await repository.CommandAsync(
+		var gameBetCommandResult = await repository.CommandAsync(
 			source: new GameBetCloseCommand(
 				GameBetId: request.GameBetId,
 				GameProviderId: request.GameProviderId,
@@ -71,6 +72,18 @@ internal class GameBetCloseWorkerHandler(
 				ClosedOn: request.ClosedOn,
 				AdditionalData: request.AdditionalData,
 				ExtendedData: request.ExtendedData),
+			cancellationToken)
+			.ConfigureAwait(false);
+
+		await publishRepository.PublishAsync(
+			source: new GameBetWorkerPublish(
+				GameProviderId: request.GameProviderId,
+				GameId: request.GameId,
+				PlayerCode: request.PlayerCode,
+				WalletId: request.WalletId,
+				ExternalBetId: request.ExternalBetId,
+				ExternalCreatedOn: request.ExternalCreatedOn,
+				Result: gameBetCommandResult),
 			cancellationToken)
 			.ConfigureAwait(false);
 	}

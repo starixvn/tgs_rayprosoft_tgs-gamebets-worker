@@ -28,17 +28,4 @@ internal class GameBetsWorkerClient(
 
 		_ = httpResponseMessage.EnsureSuccessStatusCode();
 	}
-
-	public async ValueTask HandleAsync(WorkerHandleViewModel source, CancellationToken cancellationToken = default)
-	{
-		var requestContent = JsonContent.Create(source, options: _SerializerOptions);
-
-		var httpResponseMessage = await httpClient.PostAsync(
-			"/worker",
-			requestContent,
-			cancellationToken)
-			.ConfigureAwait(false);
-
-		_ = httpResponseMessage.EnsureSuccessStatusCode();
-	}
 }
