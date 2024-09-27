@@ -37,13 +37,21 @@ internal class GameBetWorkerPublishRepository(
 			return;
 		}
 
-		var model = await client.GameBetMajorGetAsync(
+		var model = await client.GameBetClosesGetAsync(
+			externalCreatedOn: source.ExternalCreatedOn,
 			gameProviderId: source.GameProviderId,
 			gameId: source.GameId,
 			walletId: source.WalletId,
 			externalBetId: source.ExternalBetId,
-			externalCreatedOn: source.ExternalCreatedOn,
 			cancellationToken: cancellationToken)
+			.ConfigureAwait(false)
+			?? await client.GameBetMajorGetAsync(
+				externalCreatedOn: source.ExternalCreatedOn,
+				gameProviderId: source.GameProviderId,
+				gameId: source.GameId,
+				walletId: source.WalletId,
+				externalBetId: source.ExternalBetId,
+				cancellationToken: cancellationToken)
 			.ConfigureAwait(false)
 			?? throw new ArgumentNullException(
 				new

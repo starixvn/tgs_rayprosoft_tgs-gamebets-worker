@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System.Text.Json;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using Tgs.GameBets.Worker.Core.Models;
 
@@ -10,6 +11,22 @@ internal class GameBetRunningWorkerHandler(
 {
 	public Task Handle(GameBetRunningWorkerRequest request, CancellationToken cancellationToken)
 	{
+		logger.LogInformation("{logInformation}",
+			JsonSerializer.Serialize(new
+			{
+				LogOn = DateTime.Now.ToString("u"),
+				Data = new
+				{
+					request.GameProviderId,
+					request.GameId,
+					request.PlayerCode,
+					request.WalletId,
+					request.ExternalRoundId,
+					request.ExternalBetId,
+					ExternalCreatedOn = request.ExternalCreatedOn.ToString("u"),
+					request.BetState
+				}
+			}));
 		return request.BetState is GameBets.Common.Enums.BetState.Waiting or GameBets.Common.Enums.BetState.Running
 			? repository.CommandAsync(
 				source: new GameBetRunningCommand(

@@ -133,54 +133,14 @@ public class HandlesController : ControllerBase
 				},
 				cancellationToken: HttpContext.RequestAborted).AsTask()),
 			Task.Run( ()=>messageSender.PublishAsync(
-				subject: GameBetsWorkerNatsConst.GameBetWorkerRequest,
-				data: new Common.Protos.GameBetsWorkerRequest
-				{
-					GameBetId = source.GameBetId,
-					GameProviderId = source.GameProviderId,
-					GameProviderConfigurationId = source.GameProviderConfigurationId,
-					GameId = source.GameId,
-					ResellerId = source.ResellerId,
-					LicenseeId = source.LicenseeId,
-					BrandId = source.BrandId,
-					PlayerCode = source.PlayerCode,
-					CurrencyCode = source.CurrencyCode,
-					WalletId = source.WalletId,
-					ExternalRoundId = source.ExternalRoundId,
-					ExternalBetId = source.ExternalBetId,
-					ExternalCreatedOn = source.ExternalCreatedOn.ToTimestamp(),
-					ExternalClosedOn = source.ExternalClosedOn.ToTimestamp(),
-					ExternalPayoffOn = source.ExternalPayoffOn.ToTimestamp(),
-					ExternalResettleOn = source.ExternalResettleOn.ToTimestamp(),
-					BetState = source.BetState,
-					BetType = source.BetType,
-					FreeGameState = source.FreeGameState,
-					GambleState = source.GambleState,
-					CashoutState = source.CashoutState,
-					ResettleState = source.ResettleState,
-					JackpotState = source.JackpotState,
-					CurrencyRatio = source.CurrencyRatio,
-					Bet = source.Bet,
-					ValidBet = source.ValidBet,
-					Settle = source.Settle,
-					Commission = source.Commission,
-					Turnover = source.Turnover,
-					WinLoss = source.WinLoss,
-					Jackpot = source.Jackpot,
-					CreatedOn=source.CreatedOn.ToTimestamp(),
-					ClosedOn=source.ClosedOn.ToTimestamp(),
-					AdditionalData = source.AdditionalData.ToJsonString(),
-				},
-				cancellationToken: HttpContext.RequestAborted).AsTask()),
-			Task.Run( ()=>messageSender.PublishAsync(
 				subject: GameBetsWorkerNatsConst.GameBetWorkerExpiryRequest,
-				data: new Common.Protos.GameBetsWorkerExpiryRequest
+				data: new Common.Protos.GameBetWorkerExpiryRequest
 				{
 					GameProviderId = source.GameProviderId,
 					GameId = source.GameId,
 					BrandId = source.BrandId
 				},
-				cancellationToken: HttpContext.RequestAborted).AsTask()),
+				cancellationToken: HttpContext.RequestAborted).AsTask())
 		};
 
 		await Task.WhenAll(tasks).ConfigureAwait(false);

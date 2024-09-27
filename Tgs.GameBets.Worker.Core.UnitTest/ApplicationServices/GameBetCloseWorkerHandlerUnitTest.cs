@@ -13,6 +13,7 @@ public class GameBetCloseWorkerHandlerUnitTest
 	{
 		var fakeLog = NullLogger<GameBetCloseWorkerHandler>.Instance;
 		var fakeRepository = Substitute.For<IGameBetClosesRepository>();
+		var fakePublishRepository = Substitute.For<IGameBetWorkerPublishRepository>();
 
 		var externalRoundId = Guid.NewGuid().ToString();
 		var externalBetId = Guid.NewGuid().ToString();
@@ -104,12 +105,26 @@ public class GameBetCloseWorkerHandlerUnitTest
 
 		var sut = new GameBetCloseWorkerHandler(
 			fakeLog,
-			fakeRepository);
+			fakeRepository,
+			fakePublishRepository);
 
 		var cancellationTokenSource = new CancellationTokenSource();
 		var token = cancellationTokenSource.Token;
 
 		await sut.Handle(request, token);
+
+		_ = fakePublishRepository
+			.Received(1)
+			.PublishAsync(
+			source: Arg.Is(new GameBetWorkerPublish(
+				GameProviderId: request.GameProviderId,
+				GameId: request.GameId,
+				PlayerCode: request.PlayerCode,
+				WalletId: request.WalletId,
+				ExternalBetId: request.ExternalBetId,
+				ExternalCreatedOn: request.ExternalCreatedOn,
+				Result: GameBets.Common.Enums.GameBetCommandResult.Add)),
+			cancellationToken: Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -117,6 +132,7 @@ public class GameBetCloseWorkerHandlerUnitTest
 	{
 		var fakeLog = NullLogger<GameBetCloseWorkerHandler>.Instance;
 		var fakeRepository = Substitute.For<IGameBetClosesRepository>();
+		var fakePublishRepository = Substitute.For<IGameBetWorkerPublishRepository>();
 
 		var externalRoundId = Guid.NewGuid().ToString();
 		var externalBetId = Guid.NewGuid().ToString();
@@ -166,7 +182,8 @@ public class GameBetCloseWorkerHandlerUnitTest
 
 		var sut = new GameBetCloseWorkerHandler(
 			fakeLog,
-			fakeRepository);
+			fakeRepository,
+			fakePublishRepository);
 
 		var cancellationTokenSource = new CancellationTokenSource();
 		var token = cancellationTokenSource.Token;
@@ -178,6 +195,12 @@ public class GameBetCloseWorkerHandlerUnitTest
 			.CommandAsync(
 			source: Arg.Any<GameBetCloseCommand>(),
 			cancellationToken: Arg.Any<CancellationToken>());
+
+		_ = fakePublishRepository
+			.Received(0)
+			.PublishAsync(
+			source: Arg.Any<GameBetWorkerPublish>(),
+			cancellationToken: Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -185,6 +208,7 @@ public class GameBetCloseWorkerHandlerUnitTest
 	{
 		var fakeLog = NullLogger<GameBetCloseWorkerHandler>.Instance;
 		var fakeRepository = Substitute.For<IGameBetClosesRepository>();
+		var fakePublishRepository = Substitute.For<IGameBetWorkerPublishRepository>();
 
 		var externalRoundId = Guid.NewGuid().ToString();
 		var externalBetId = Guid.NewGuid().ToString();
@@ -234,7 +258,8 @@ public class GameBetCloseWorkerHandlerUnitTest
 
 		var sut = new GameBetCloseWorkerHandler(
 			fakeLog,
-			fakeRepository);
+			fakeRepository,
+			fakePublishRepository);
 
 		var cancellationTokenSource = new CancellationTokenSource();
 		var token = cancellationTokenSource.Token;
@@ -245,6 +270,12 @@ public class GameBetCloseWorkerHandlerUnitTest
 			.Received(0)
 			.CommandAsync(
 			source: Arg.Any<GameBetCloseCommand>(),
+			cancellationToken: Arg.Any<CancellationToken>());
+
+		_ = fakePublishRepository
+			.Received(0)
+			.PublishAsync(
+			source: Arg.Any<GameBetWorkerPublish>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 }
