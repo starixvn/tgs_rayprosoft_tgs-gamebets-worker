@@ -10,7 +10,6 @@ namespace Tgs.GameBets.Worker.Repositories;
 
 internal class GameBetWorkerPublishRepository(
 	ILogger<GameBetWorkerPublishRepository> logger,
-	IGameBetsClient client,
 	IMessageSender messageSender) : IGameBetWorkerPublishRepository
 {
 	public async ValueTask PublishAsync(GameBetWorkerPublish source, CancellationToken cancellationToken = default)
@@ -37,70 +36,42 @@ internal class GameBetWorkerPublishRepository(
 			return;
 		}
 
-		var model = await client.GameBetClosesGetAsync(
-			externalCreatedOn: source.ExternalCreatedOn,
-			gameProviderId: source.GameProviderId,
-			gameId: source.GameId,
-			walletId: source.WalletId,
-			externalBetId: source.ExternalBetId,
-			cancellationToken: cancellationToken)
-			.ConfigureAwait(false)
-			?? await client.GameBetMajorGetAsync(
-				externalCreatedOn: source.ExternalCreatedOn,
-				gameProviderId: source.GameProviderId,
-				gameId: source.GameId,
-				walletId: source.WalletId,
-				externalBetId: source.ExternalBetId,
-				cancellationToken: cancellationToken)
-			.ConfigureAwait(false)
-			?? throw new ArgumentNullException(
-				new
-				{
-					source.GameProviderId,
-					source.GameId,
-					source.PlayerCode,
-					source.WalletId,
-					source.ExternalBetId,
-					source.ExternalCreatedOn
-				}.ToString(),
-				"This game bet does not exist.");
-
 		var publish = new Common.Protos.GameBetsWorkerPublish
 		{
-			GameBetId = model.Id,
-			GameProviderId = model.GameProviderId,
-			GameProviderConfigurationId = model.GameProviderConfigurationId,
-			GameId = model.GameId,
-			ResellerId = model.ResellerId,
-			LicenseeId = model.LicenseeId,
-			BrandId = model.BrandId,
-			PlayerCode = model.PlayerCode,
-			CurrencyCode = model.CurrencyCode,
-			WalletId = model.WalletId,
-			ExternalRoundId = model.ExternalRoundId,
-			ExternalBetId = model.ExternalBetId,
-			ExternalCreatedOn = model.ExternalCreatedOn.ToTimestamp(),
-			ExternalClosedOn = model.ExternalClosedOn.ToTimestamp(),
-			ExternalPayoffOn = model.ExternalPayoffOn.ToTimestamp(),
-			ExternalResettleOn = model.ExternalResettleOn.ToTimestamp(),
-			BetState = (Common.Protos.BetState)model.BetState,
-			BetType = (Common.Protos.BetType)model.BetType,
-			FreeGameState = (Common.Protos.FreeGameState)model.FreeGameState,
-			GambleState = (Common.Protos.GambleState)model.GambleState,
-			CashoutState = (Common.Protos.CashoutState)model.CashoutState,
-			ResettleState = (Common.Protos.ResettleState)model.ResettleState,
-			JackpotState = (Common.Protos.JackpotState)model.JackpotState,
-			CurrencyRatio = model.CurrencyRatio,
-			Bet = model.Bet,
-			ValidBet = model.ValidBet,
-			Settle = model.Settle,
-			Commission = model.Commission,
-			Turnover = model.Turnover,
-			WinLoss = model.WinLoss,
-			Jackpot = model.Jackpot,
-			CreatedOn = model.CreatedOn.ToTimestamp(),
-			ClosedOn = model.ClosedOn.ToTimestamp(),
-			UpdatedOn = model.UpdatedOn.ToTimestamp()
+			GameBetId = source.GameBetId,
+			GameProviderId = source.GameProviderId,
+			GameProviderConfigurationId = source.GameProviderConfigurationId,
+			GameId = source.GameId,
+			ResellerId = source.ResellerId,
+			LicenseeId = source.LicenseeId,
+			BrandId = source.BrandId,
+			PlayerCode = source.PlayerCode,
+			CurrencyCode = source.CurrencyCode,
+			WalletId = source.WalletId,
+			ExternalRoundId = source.ExternalRoundId,
+			ExternalBetId = source.ExternalBetId,
+			ExternalCreatedOn = source.ExternalCreatedOn.ToTimestamp(),
+			ExternalClosedOn = source.ExternalClosedOn.ToTimestamp(),
+			ExternalPayoffOn = source.ExternalPayoffOn.ToTimestamp(),
+			ExternalResettleOn = source.ExternalResettleOn.ToTimestamp(),
+			BetState = (Common.Protos.BetState)source.BetState,
+			BetType = (Common.Protos.BetType)source.BetType,
+			FreeGameState = (Common.Protos.FreeGameState)source.FreeGameState,
+			GambleState = (Common.Protos.GambleState)source.GambleState,
+			CashoutState = (Common.Protos.CashoutState)source.CashoutState,
+			ResettleState = (Common.Protos.ResettleState)source.ResettleState,
+			JackpotState = (Common.Protos.JackpotState)source.JackpotState,
+			CurrencyRatio = source.CurrencyRatio,
+			Bet = source.Bet,
+			ValidBet = source.ValidBet,
+			Settle = source.Settle,
+			Commission = source.Commission,
+			Turnover = source.Turnover,
+			WinLoss = source.WinLoss,
+			Jackpot = source.Jackpot,
+			CreatedOn = source.CreatedOn.ToTimestamp(),
+			ClosedOn = source.ClosedOn.ToTimestamp(),
+			UpdatedOn = source.ClosedOn.ToTimestamp()
 		};
 
 		await messageSender.PublishAsync(

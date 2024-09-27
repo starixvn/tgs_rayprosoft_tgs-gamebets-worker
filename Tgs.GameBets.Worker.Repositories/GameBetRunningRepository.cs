@@ -9,7 +9,7 @@ using Tgs.GameBets.Worker.Core.Models;
 namespace Tgs.GameBets.Worker.Repositories;
 
 internal class GameBetRunningRepository(
-	ILogger<GameBetRepository> logger,
+	ILogger<GameBetRunningRepository> logger,
 	IOptions<PolicySettingsOptions> options,
 	IGameBetsClient client) : IGameBetRunningRepository
 {
