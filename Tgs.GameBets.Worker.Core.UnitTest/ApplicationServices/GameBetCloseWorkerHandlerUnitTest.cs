@@ -116,14 +116,42 @@ public class GameBetCloseWorkerHandlerUnitTest
 		_ = fakePublishRepository
 			.Received(1)
 			.PublishAsync(
-			source: Arg.Is(new GameBetWorkerPublish(
-				GameProviderId: request.GameProviderId,
-				GameId: request.GameId,
-				PlayerCode: request.PlayerCode,
-				WalletId: request.WalletId,
-				ExternalBetId: request.ExternalBetId,
-				ExternalCreatedOn: request.ExternalCreatedOn,
-				Result: GameBets.Common.Enums.GameBetCommandResult.Add)),
+			source: Arg.Is<GameBetWorkerPublish>(compare =>
+				compare.GameBetId == request.GameBetId &&
+				compare.GameProviderId == request.GameProviderId &&
+				compare.GameProviderConfigurationId == request.GameProviderConfigurationId &&
+				compare.GameId == request.GameId &&
+				compare.ResellerId == request.ResellerId &&
+				compare.LicenseeId == request.LicenseeId &&
+				compare.BrandId == request.BrandId &&
+				compare.PlayerCode == request.PlayerCode &&
+				compare.CurrencyCode == request.CurrencyCode &&
+				compare.WalletId == request.WalletId &&
+				compare.ExternalRoundId == request.ExternalRoundId &&
+				compare.ExternalBetId == request.ExternalBetId &&
+				compare.ExternalCreatedOn == request.ExternalCreatedOn &&
+				compare.ExternalClosedOn == request.ExternalClosedOn &&
+				compare.ExternalPayoffOn == request.ExternalPayoffOn &&
+				compare.ExternalResettleOn == request.ExternalResettleOn &&
+				compare.BetState == request.BetState &&
+				compare.BetType == request.BetType &&
+				compare.FreeGameState == request.FreeGameState &&
+				compare.GambleState == request.GambleState &&
+				compare.CashoutState == request.CashoutState &&
+				compare.ResettleState == request.ResettleState &&
+				compare.JackpotState == request.JackpotState &&
+				compare.CurrencyRatio == request.CurrencyRatio &&
+				compare.Bet == request.Bet &&
+				compare.ValidBet == request.ValidBet &&
+				compare.Settle == request.Settle &&
+				compare.WinLoss == request.WinLoss &&
+				compare.Turnover == request.Turnover &&
+				compare.Commission == request.Commission &&
+				compare.Contribute == request.Contribute &&
+				compare.Jackpot == request.Jackpot &&
+				compare.CreatedOn == request.CreatedOn &&
+				compare.ClosedOn == request.ClosedOn &&
+				compare.Result == GameBets.Common.Enums.GameBetCommandResult.Add),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 

@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Logging;
 using Tgs.GameBets.Worker.Core.Models;
 
@@ -77,12 +78,40 @@ internal class GameBetCloseWorkerHandler(
 
 		await publishRepository.PublishAsync(
 			source: new GameBetWorkerPublish(
+				GameBetId: request.GameBetId,
 				GameProviderId: request.GameProviderId,
+				GameProviderConfigurationId: request.GameProviderConfigurationId,
 				GameId: request.GameId,
+				ResellerId: request.ResellerId,
+				LicenseeId: request.LicenseeId,
+				BrandId: request.BrandId,
 				PlayerCode: request.PlayerCode,
+				CurrencyCode: request.CurrencyCode,
 				WalletId: request.WalletId,
+				ExternalRoundId: request.ExternalRoundId,
 				ExternalBetId: request.ExternalBetId,
 				ExternalCreatedOn: request.ExternalCreatedOn,
+				ExternalClosedOn: request.ExternalClosedOn,
+				ExternalPayoffOn: request.ExternalPayoffOn,
+				ExternalResettleOn: request.ExternalResettleOn,
+				BetState: request.BetState,
+				BetType: request.BetType,
+				FreeGameState: request.FreeGameState,
+				GambleState: request.GambleState,
+				CashoutState: request.CashoutState,
+				ResettleState: request.ResettleState,
+				JackpotState: request.JackpotState,
+				CurrencyRatio: request.CurrencyRatio,
+				Bet: request.Bet,
+				ValidBet: request.ValidBet,
+				Settle: request.Settle,
+				WinLoss: request.WinLoss,
+				Turnover: request.Turnover,
+				Commission: request.Commission,
+				Contribute: request.Contribute,
+				Jackpot: request.Jackpot,
+				CreatedOn: request.CreatedOn,
+				ClosedOn: request.ClosedOn,
 				Result: gameBetCommandResult),
 			cancellationToken)
 			.ConfigureAwait(false);
